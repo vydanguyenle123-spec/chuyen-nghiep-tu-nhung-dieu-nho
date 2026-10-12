@@ -1,0 +1,939 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chuyên Nghiệp Từ Những Điều Nhỏ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ===== Design tokens =====
+     Layout: single-screen facilitator console, một "sân khấu" căn giữa cho
+     mỗi bước (chào mừng → nguyên tắc → warm-up → luật chơi → bảng bốc thăm
+     4×3 → đúc kết), nền kem ấm với dải sóng trang trí + linh vật mặt trời
+     "Sunny" nhấp nhô theo từng cảnh. */
+  :root{
+    --bg:#FBF6EE;
+    --bg-deep:#F1E6CE;
+    --surface:#FFFFFF;
+    --surface-2:#F3E9D7;
+    --ink:#332B20;
+    --ink-soft:#7A6D57;
+    --line:#E7D9BC;
+
+    --orange:#D98C22;
+    --orange-strong:#B9700F;
+    --orange-soft:#F6DFAF;
+    --on-orange:#3A2605;
+
+    --blue:#1F93AC;
+    --blue-strong:#146C80;
+    --blue-soft:#CFEAEF;
+    --on-blue:#07323B;
+
+    --good:#4C9A6A;
+
+    --font-display:"Bricolage Grotesque","Be Vietnam Pro",sans-serif;
+    --font-body:"Be Vietnam Pro","Segoe UI",sans-serif;
+
+    --shadow-1: 0 1px 2px rgba(51,43,32,.08), 0 1px 1px rgba(51,43,32,.05);
+    --shadow-2: 0 8px 24px rgba(51,43,32,.14), 0 2px 6px rgba(51,43,32,.08);
+    --shadow-3: 0 20px 48px rgba(51,43,32,.22), 0 6px 16px rgba(51,43,32,.12);
+
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#1B1712; --bg-deep:#130F0B;
+      --surface:#262019; --surface-2:#352B1E;
+      --ink:#F3EADA; --ink-soft:#C3B49A; --line:#4A3D29;
+      --orange:#E8A23C; --orange-strong:#F3B65B; --orange-soft:#4A3718; --on-orange:#2A1A02;
+      --blue:#4DBBD2; --blue-strong:#6ECBE0; --blue-soft:#163A41; --on-blue:#CFF2F8;
+      --good:#78C494;
+      --shadow-1: 0 1px 2px rgba(0,0,0,.35);
+      --shadow-2: 0 8px 24px rgba(0,0,0,.45);
+      --shadow-3: 0 20px 48px rgba(0,0,0,.55);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#1B1712; --bg-deep:#130F0B;
+    --surface:#262019; --surface-2:#352B1E;
+    --ink:#F3EADA; --ink-soft:#C3B49A; --line:#4A3D29;
+    --orange:#E8A23C; --orange-strong:#F3B65B; --orange-soft:#4A3718; --on-orange:#2A1A02;
+    --blue:#4DBBD2; --blue-strong:#6ECBE0; --blue-soft:#163A41; --on-blue:#CFF2F8;
+    --good:#78C494;
+    --shadow-1: 0 1px 2px rgba(0,0,0,.35);
+    --shadow-2: 0 8px 24px rgba(0,0,0,.45);
+    --shadow-3: 0 20px 48px rgba(0,0,0,.55);
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    min-height:100%;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  /* ---------- decorative wave strip ---------- */
+  .wave{position:fixed;inset:auto 0 0 0;height:120px;pointer-events:none;opacity:.55;z-index:0;overflow:hidden;}
+  .wave svg{width:220%;height:100%;animation:drift 26s linear infinite;}
+  @keyframes drift{to{transform:translateX(-50%);}}
+  .blob{position:fixed;border-radius:50%;filter:blur(40px);opacity:.35;pointer-events:none;z-index:0;}
+  .blob-a{width:260px;height:260px;background:var(--orange-soft);top:-80px;right:-60px;}
+  .blob-b{width:220px;height:220px;background:var(--blue-soft);bottom:40px;left:-70px;}
+
+  .app{
+    position:relative;z-index:1;
+    min-height:100%;
+    display:flex;
+    flex-direction:column;
+    padding:clamp(16px,3vw,32px) clamp(16px,4vw,48px) 28px;
+  }
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    margin-bottom:clamp(14px,2.5vw,26px);flex-wrap:wrap;
+  }
+  .brand{
+    display:flex;align-items:center;gap:10px;font-family:var(--font-display);
+    font-weight:700;letter-spacing:.3px;color:var(--ink-soft);font-size:13px;text-transform:uppercase;
+  }
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 3px var(--orange-soft);}
+  .top-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .chip-btn{
+    background:transparent;color:var(--ink-soft);border:1.5px solid var(--line);
+    border-radius:999px;padding:7px 14px;font-size:12.5px;font-family:var(--font-body);
+    font-weight:600;cursor:pointer;transition:color .15s,border-color .15s;
+  }
+  .chip-btn:hover{color:var(--ink);border-color:var(--ink-soft);}
+  .chip-btn[aria-pressed="false"]{opacity:.55;}
+  .steps{display:flex;gap:7px;}
+  .steps i{width:7px;height:7px;border-radius:50%;background:var(--line);transition:background .25s,transform .25s;}
+  .steps i.on{background:var(--orange);transform:scale(1.3);}
+  .steps i.done{background:var(--blue);}
+
+  main{flex:1;display:flex;flex-direction:column;min-width:0;position:relative;}
+
+  .screen{display:none;flex:1;flex-direction:column;animation:rise .45s ease both;}
+  .screen.active{display:flex;}
+  @keyframes rise{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+  .center-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:18px;padding:12px 0;}
+
+  .eyebrow{
+    font-family:var(--font-display);font-weight:700;font-size:12.5px;letter-spacing:2.4px;
+    text-transform:uppercase;color:var(--blue-strong);
+  }
+  .eyebrow.xl{font-size:clamp(15px,2vw,19px);letter-spacing:3px;color:var(--orange-strong);}
+  h1.title{
+    font-family:var(--font-display);font-weight:800;font-size:clamp(28px,5.4vw,52px);
+    line-height:1.08;margin:0;color:var(--ink);text-wrap:balance;
+  }
+  h1.title .hl{color:var(--orange);}
+  .letter{max-width:600px;text-align:left;display:flex;flex-direction:column;gap:14px;}
+  p.lede{font-size:clamp(15px,1.6vw,17.5px);line-height:1.68;color:var(--ink-soft);margin:0;text-align:justify;text-align-last:left;}
+  p.lede.greet{font-family:var(--font-display);font-weight:700;font-size:clamp(17px,2vw,20px);color:var(--ink);text-align:left;}
+
+  .btn{
+    font-family:var(--font-display);font-weight:700;font-size:15.5px;border:none;border-radius:999px;
+    padding:13px 28px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;
+    transition:transform .15s ease, box-shadow .15s ease, background .15s ease;box-shadow:var(--shadow-1);
+  }
+  .btn:active{transform:translateY(1px) scale(.98);}
+  .btn-primary{background:var(--orange);color:var(--on-orange);box-shadow:var(--shadow-2);}
+  .btn-primary:hover{background:var(--orange-strong);}
+  .btn-ghost{background:transparent;color:var(--ink-soft);border:1.5px solid var(--line);box-shadow:none;}
+  .btn-ghost:hover{color:var(--ink);border-color:var(--ink-soft);}
+  .btn-blue{background:var(--blue);color:#fff;}
+  .btn-blue:hover{background:var(--blue-strong);}
+  .btn-sm{padding:9px 16px;font-size:13.5px;}
+  .btn[disabled]{opacity:.45;cursor:not-allowed;}
+  .btnrow{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+
+  /* ---------- principles screen ---------- */
+  .rules{list-style:none;margin:6px 0 4px;padding:0;display:grid;gap:11px;width:100%;max-width:680px;text-align:left;}
+  .rules li{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);padding:14px 18px;border-radius:16px;box-shadow:var(--shadow-1);}
+  .rules li b{font-family:var(--font-display);color:var(--orange);font-size:18px;min-width:1.3em;line-height:1.4;}
+  .rules li span{font-size:13.5px;color:var(--ink-soft);line-height:1.5;}
+  .rules li span strong{color:var(--ink);font-weight:700;}
+
+  .order-note{
+    max-width:680px;background:var(--orange-soft);color:var(--on-orange);border-radius:16px;
+    padding:14px 18px;font-size:13.5px;line-height:1.55;text-align:left;display:flex;gap:10px;
+  }
+  .order-note b{font-family:var(--font-display);}
+
+  /* ---------- warm-up screen ---------- */
+  .cup{
+    width:84px;height:84px;border-radius:24px;background:linear-gradient(145deg,var(--orange-soft),var(--surface-2));
+    display:flex;align-items:center;justify-content:center;font-size:38px;box-shadow:var(--shadow-2);margin-bottom:2px;
+  }
+  h2.big-eyebrow{
+    font-family:var(--font-display);font-weight:800;font-size:clamp(26px,4.4vw,40px);
+    letter-spacing:.5px;text-transform:uppercase;color:var(--orange-strong);margin:0;text-wrap:balance;
+  }
+  .prompt-card{
+    max-width:600px;background:var(--surface);border:1px solid var(--line);border-radius:22px;
+    padding:clamp(22px,4vw,34px);box-shadow:var(--shadow-2);
+  }
+  .prompt-card .q{font-family:var(--font-display);font-weight:700;font-size:clamp(19px,2.6vw,25px);line-height:1.3;color:var(--ink);text-wrap:balance;}
+  .prompt-card .hint{margin-top:10px;font-size:13.5px;color:var(--ink-soft);}
+
+  /* ---------- rules-of-game screen ---------- */
+  .ritual{list-style:none;margin:0;padding:0;display:grid;gap:11px;width:100%;max-width:640px;text-align:left;counter-reset:r;}
+  .ritual li{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);padding:15px 18px;border-radius:16px;counter-increment:r;box-shadow:var(--shadow-1);}
+  .ritual li::before{content:counter(r);font-family:var(--font-display);font-weight:800;color:#fff;background:var(--blue);min-width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13.5px;flex:none;}
+  .ritual li span{font-size:14px;color:var(--ink-soft);line-height:1.5;padding-top:2px;}
+  .ritual li span strong{color:var(--ink);}
+
+  /* ---------- board screen ---------- */
+  .board-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px;}
+  .board-head h2{font-family:var(--font-display);font-size:clamp(18px,2.4vw,24px);margin:0;}
+  .board-head p{margin:2px 0 0;color:var(--ink-soft);font-size:13.5px;}
+  .progress-pill{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);padding:8px 16px 8px 8px;border-radius:999px;box-shadow:var(--shadow-1);}
+  .progress-pill .ring{width:30px;height:30px;border-radius:50%;background:conic-gradient(var(--blue) calc(var(--pct,0)*1%), var(--line) 0);display:flex;align-items:center;justify-content:center;flex:none;}
+  .progress-pill .ring::after{content:"";width:21px;height:21px;border-radius:50%;background:var(--surface);}
+  .progress-pill span{font-family:var(--font-display);font-weight:700;font-size:14px;}
+  .progress-pill small{color:var(--ink-soft);font-weight:500;}
+
+  .board{flex:1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(10px,1.6vw,16px);align-content:start;}
+  @media (max-width:860px){ .board{grid-template-columns:repeat(3,minmax(0,1fr));} }
+  @media (max-width:560px){ .board{grid-template-columns:repeat(2,minmax(0,1fr));} }
+
+  .tile{position:relative;aspect-ratio:1/0.82;perspective:900px;}
+  .tile button.face{
+    position:absolute;inset:0;width:100%;height:100%;border:none;border-radius:18px;cursor:pointer;
+    font-family:var(--font-display);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    backface-visibility:hidden;transition:transform .5s cubic-bezier(.4,.2,.2,1), box-shadow .2s;
+    transform-style:preserve-3d;box-shadow:var(--shadow-1);
+  }
+  .tile .front{background:var(--surface);border:1.5px solid var(--line);color:var(--ink);}
+  .tile .front .eb{font-size:10.5px;color:var(--ink-soft);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;font-family:var(--font-body);}
+  .tile .front .num{font-size:clamp(24px,3.4vw,34px);font-weight:800;line-height:1.05;}
+  .tile:nth-child(4n+1) .front .num,.tile:nth-child(4n+3) .front .num{color:var(--orange);}
+  .tile:nth-child(4n+2) .front .num,.tile:nth-child(4n+4) .front .num{color:var(--blue);}
+  .tile .back{background:var(--blue);color:var(--on-blue);transform:rotateY(180deg);font-size:12px;padding:10px;text-align:center;line-height:1.3;}
+  .tile .back b{font-size:11px;letter-spacing:1px;text-transform:uppercase;opacity:.85;}
+  .tile.flipped .front{transform:rotateY(-180deg);}
+  .tile.flipped .back{transform:rotateY(0deg);}
+  .tile.done .front{background:var(--surface-2);}
+  .tile.done .front .num{color:var(--good);}
+  .tile button.face:hover{box-shadow:var(--shadow-2);}
+  .tile.done button.face{cursor:default;}
+  .check{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:var(--good);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:var(--shadow-1);opacity:0;transform:scale(.5);transition:opacity .2s, transform .2s;}
+  .tile.done .check{opacity:1;transform:scale(1);}
+
+  .logo-tile{background:linear-gradient(150deg,var(--orange-soft),var(--blue-soft));border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;padding:8px;box-shadow:var(--shadow-1);}
+  .logo-tile b{font-family:var(--font-display);font-size:12px;color:var(--ink);letter-spacing:.5px;}
+  .logo-tile span{font-size:10.5px;color:var(--ink-soft);}
+
+  .board-footer{margin-top:18px;display:flex;justify-content:center;}
+
+  /* ---------- overlay (reveal + question) ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(27,23,18,.58);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:20px;z-index:40;opacity:0;pointer-events:none;transition:opacity .25s ease;}
+  .overlay.show{opacity:1;pointer-events:auto;}
+  .panel{width:100%;max-width:640px;background:var(--surface);border-radius:26px;box-shadow:var(--shadow-3);padding:clamp(22px,4vw,36px);transform:translateY(14px) scale(.98);transition:transform .3s ease;max-height:92vh;overflow-y:auto;}
+  .overlay.show .panel{transform:translateY(0) scale(1);}
+
+  .reveal-wrap{text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 0 6px;}
+  .reveal-eyebrow{font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:2.2px;text-transform:uppercase;color:var(--blue-strong);}
+  .reveal-num{font-family:var(--font-display);font-weight:800;font-size:clamp(4rem,16vw,7rem);line-height:1;color:var(--orange);animation:pop .5s cubic-bezier(.2,1.6,.4,1) both;}
+  @keyframes pop{from{transform:scale(.4);opacity:0;}to{transform:none;opacity:1;}}
+  .reveal-sub{color:var(--ink-soft);font-size:14px;max-width:420px;}
+
+  .panel-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;}
+  .q-badge{font-family:var(--font-display);font-weight:800;font-size:13px;background:var(--orange);color:var(--on-orange);padding:6px 14px;border-radius:999px;letter-spacing:.5px;}
+  .close-x{background:none;border:none;color:var(--ink-soft);font-size:20px;cursor:pointer;line-height:1;padding:4px;}
+  .q-text{font-family:var(--font-display);font-weight:700;font-size:clamp(19px,2.8vw,25px);line-height:1.32;color:var(--ink);margin:0 0 20px;text-wrap:balance;}
+
+  .phase{display:flex;align-items:center;gap:14px;background:var(--surface-2);border-radius:18px;padding:14px 18px;margin-bottom:14px;}
+  .phase .tring{position:relative;width:58px;height:58px;border-radius:50%;background:conic-gradient(var(--ring,var(--orange)) calc(var(--p,0)*1%), var(--line) 0);display:flex;align-items:center;justify-content:center;flex:none;}
+  .phase .tring::after{content:"";position:absolute;inset:5px;border-radius:50%;background:var(--surface-2);}
+  .phase .tring .time{position:relative;font-family:var(--font-display);font-weight:800;font-size:13.5px;font-variant-numeric:tabular-nums;}
+  .phase .meta b{display:block;font-family:var(--font-display);font-size:14.5px;}
+  .phase .meta span{font-size:12.5px;color:var(--ink-soft);}
+
+  .note-hint{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;background:var(--blue-soft);color:var(--on-blue);border-radius:14px;padding:10px 14px;margin-bottom:18px;}
+  .panel-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;}
+
+  /* ---------- applause overlay ---------- */
+  .applause{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(27,23,18,.5);z-index:60;opacity:0;pointer-events:none;transition:opacity .2s ease;}
+  .applause.show{opacity:1;}
+  .applause-card{background:var(--surface);border-radius:26px;padding:38px 44px;text-align:center;box-shadow:var(--shadow-3);transform:scale(.85);transition:transform .3s cubic-bezier(.3,1.4,.4,1);position:relative;overflow:visible;}
+  .applause.show .applause-card{transform:scale(1);}
+  .clap-row{display:flex;justify-content:center;gap:4px;margin-bottom:6px;}
+  .clap-row span{font-size:30px;display:inline-block;animation:clapwig .45s ease-in-out infinite alternate;}
+  .clap-row span:nth-child(2){animation-delay:.12s;}
+  .clap-row span:nth-child(3){animation-delay:.24s;}
+  @keyframes clapwig{from{transform:rotate(-14deg) translateY(0);}to{transform:rotate(14deg) translateY(-6px);}}
+  .applause-card b{display:block;font-family:var(--font-display);font-size:19px;margin-bottom:3px;}
+  .applause-card span.sub{font-size:13.5px;color:var(--ink-soft);}
+
+  /* ---------- closing screen ---------- */
+  .closing-badge{width:70px;height:70px;border-radius:22px;background:linear-gradient(150deg,var(--orange-soft),var(--blue-soft));display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:var(--shadow-2);}
+  .closing-msg{max-width:600px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px 26px;font-size:14.5px;line-height:1.65;color:var(--ink-soft);box-shadow:var(--shadow-1);}
+
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:61;width:100%;height:100%;}
+
+  /* ---------- Sunny mascot ---------- */
+  .mascot-wrap{position:fixed;right:clamp(10px,3vw,34px);bottom:clamp(10px,3vw,30px);width:clamp(64px,9vw,96px);z-index:5;pointer-events:none;filter:drop-shadow(0 10px 14px rgba(51,43,32,.18));animation:bob 3.4s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg);}50%{transform:translateY(-10px) rotate(2deg);}}
+  .mascot-wrap.cheer{animation:cheerbounce .5s ease-in-out infinite;}
+  @keyframes cheerbounce{0%,100%{transform:translateY(0) rotate(-4deg) scale(1);}50%{transform:translateY(-16px) rotate(4deg) scale(1.06);}}
+  .mascot-wrap svg{width:100%;height:auto;display:block;}
+  @media (max-width:520px){ .mascot-wrap{width:56px;opacity:.9;} }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.01ms !important; transition-duration:.01ms !important;}
+  }
+</style>
+
+<div class="wave" aria-hidden="true">
+  <svg viewBox="0 0 1600 140" preserveAspectRatio="none">
+    <path d="M0,70 C 200,20 400,120 600,70 C 800,20 1000,120 1200,70 C 1400,20 1600,70 1600,70 L1600,140 L0,140 Z" fill="var(--orange-soft)" opacity=".55"/>
+    <path d="M0,95 C 220,140 420,55 640,95 C 860,140 1060,55 1280,95 C 1500,140 1600,100 1600,100 L1600,140 L0,140 Z" fill="var(--blue-soft)" opacity=".55" transform="translate(0,6)"/>
+  </svg>
+</div>
+<div class="blob blob-a" aria-hidden="true"></div>
+<div class="blob blob-b" aria-hidden="true"></div>
+
+<div class="app">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>SUNNYCARE · METTASOUL — CIRCLE TIME</div>
+    <div class="top-actions">
+      <button class="chip-btn" id="musicBtn" type="button" aria-pressed="true">Nhạc nền: bật</button>
+      <button class="chip-btn" id="soundBtn" type="button" aria-pressed="true">Hiệu ứng: bật</button>
+      <div class="steps" id="steps">
+        <i data-step="welcome"></i><i data-step="warmup"></i><i data-step="rules"></i><i data-step="board"></i>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <!-- SCREEN 1: WELCOME -->
+    <section class="screen active" id="screen-welcome">
+      <div class="center-wrap">
+        <div class="eyebrow">Circle Time hôm nay</div>
+        <h1 class="title">Chuyên Nghiệp Từ<br><span class="hl">Những Điều Nhỏ</span></h1>
+        <div class="letter">
+          <p class="lede greet">Mến chào cả nhà 👋</p>
+          <p class="lede">Dành cho nhau 120 phút chất lượng hôm nay, chúng ta cùng lắng nghe và sẻ chia về một chủ đề rất đỗi gần gũi: hình ảnh và tác phong của mỗi người tại SUNNYCARE – METTASOUL — qua giờ giấc, trang phục và tinh thần trách nhiệm.</p>
+          <p class="lede">Buổi Circle Time này là không gian an lành để cả team cùng nhìn lại bức tranh chung, thấu hiểu trải nghiệm của nhau, từ đó nâng niu những thói quen tốt để môi trường làm việc ngày càng trọn vẹn và chuyên nghiệp.</p>
+        </div>
+        <div class="btnrow">
+          <button class="btn btn-primary" onclick="goTo('warmup')">Bắt đầu 🌿</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: WARM-UP -->
+    <section class="screen" id="screen-warmup">
+      <div class="center-wrap">
+        <div class="cup">☕</div>
+        <h2 class="big-eyebrow">Warm-up</h2>
+        <div class="prompt-card">
+          <div class="q">"Đồ uống bạn chọn hôm nay đang nói lên điều gì về tâm trạng của bạn?"</div>
+          <div class="hint">Mỗi người chia sẻ thật ngắn gọn — một câu cũng được.</div>
+        </div>
+        <div class="btnrow">
+          <button class="btn btn-ghost" onclick="goTo('welcome')">Quay lại</button>
+          <button class="btn btn-primary" onclick="goTo('rules')">Tiếp tục</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: CÁCH THAM GIA (how to join + sharing order) -->
+    <section class="screen" id="screen-rules">
+      <div class="center-wrap">
+        <div class="eyebrow">Trước khi bốc thăm</div>
+        <h1 class="title" style="font-size:clamp(24px,4vw,36px)">Cách tham gia</h1>
+        <ol class="ritual">
+          <li><span><strong>Bốc thăm một con số</strong> cho riêng mình, từ 1 đến 11.</span></li>
+          <li><span>Con số đó <strong>tương ứng với số thứ tự câu hỏi</strong> bạn sẽ mở trên bảng.</span></li>
+          <li><span><strong>30 giây</strong> đầu tiên để suy nghĩ nhanh, gom ý tưởng trong đầu.</span></li>
+          <li><span><strong>Tối đa 2 phút</strong> để chia sẻ câu trả lời với cả vòng tròn.</span></li>
+          <li><span><strong>Thứ tự chia sẻ:</strong> vòng tròn bắt đầu từ người ngồi kế bên chị Sunny, đi lần lượt quanh vòng theo chiều kim đồng hồ.</span></li>
+        </ol>
+        <div class="btnrow">
+          <button class="btn btn-ghost" onclick="goTo('warmup')">Quay lại</button>
+          <button class="btn btn-primary" onclick="goTo('board')">Bắt đầu chia sẻ 🎲</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 4: BOARD -->
+    <section class="screen" id="screen-board">
+      <div class="board-head">
+        <div>
+          <h2>SỐ CỦA BẠN LÀ...</h2>
+        </div>
+        <div class="progress-pill">
+          <div class="ring" id="progressRing"><span class="sr"></span></div>
+          <span id="progressText">0/11</span>
+          <small>đã chia sẻ</small>
+        </div>
+      </div>
+      <div class="board" id="board"></div>
+      <div class="board-footer" id="boardFooter" style="display:none;">
+        <button class="btn btn-blue" onclick="goTo('closing')">Tất cả đã chia sẻ — Đến phần đúc kết 🌟</button>
+      </div>
+    </section>
+
+    <!-- SCREEN 5: CLOSING -->
+    <section class="screen" id="screen-closing">
+      <div class="center-wrap">
+        <div class="closing-badge">🌼</div>
+        <h1 class="title" style="font-size:clamp(24px,4vw,34px)">Cảm ơn team đã cùng chia sẻ</h1>
+        <div class="closing-msg">Tác phong, giờ giấc, trang phục không phải là hình thức — đó là lời giới thiệu không lời về con người và văn hóa SUNNYCARE – METTASOUL. Khi mỗi người ý thức và chủ động giữ gìn, cả team cùng giữ được niềm tin với khách hàng, phụ huynh và chính nhau.</div>
+        <div class="btnrow">
+          <button class="btn btn-ghost" onclick="resetAll()">Bắt đầu lại từ đầu</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- MASCOT -->
+<div class="mascot-wrap" id="mascot">
+  <svg viewBox="0 0 100 100" aria-hidden="true">
+    <g id="mascotRays" stroke="#D98C22" stroke-width="5" stroke-linecap="round" opacity=".85">
+      <line x1="50" y1="4" x2="50" y2="14"/>
+      <line x1="50" y1="86" x2="50" y2="96"/>
+      <line x1="4" y1="50" x2="14" y2="50"/>
+      <line x1="86" y1="50" x2="96" y2="50"/>
+      <line x1="16" y1="16" x2="23" y2="23"/>
+      <line x1="77" y1="23" x2="84" y2="16"/>
+      <line x1="16" y1="84" x2="23" y2="77"/>
+      <line x1="77" y1="77" x2="84" y2="84"/>
+    </g>
+    <circle cx="50" cy="52" r="30" fill="#F2A93B"/>
+    <circle cx="50" cy="52" r="30" fill="none" stroke="#B9700F" stroke-width="2.5"/>
+    <circle cx="40" cy="48" r="3.4" fill="#3A2605"/>
+    <circle cx="60" cy="48" r="3.4" fill="#3A2605"/>
+    <circle cx="33" cy="58" r="4.5" fill="#F3B65B" opacity=".7"/>
+    <circle cx="67" cy="58" r="4.5" fill="#F3B65B" opacity=".7"/>
+    <path d="M40 62 Q50 71 60 62" stroke="#3A2605" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path id="mascotArmL" d="M24 55 Q10 50 8 36" stroke="#B9700F" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path id="mascotArmR" d="M76 55 Q90 50 92 36" stroke="#B9700F" stroke-width="5" fill="none" stroke-linecap="round"/>
+  </svg>
+</div>
+
+<!-- QUESTION OVERLAY -->
+<div class="overlay" id="overlay">
+  <div class="panel" id="panelInner">
+    <!-- content injected by JS: reveal step, then question step -->
+  </div>
+</div>
+
+<!-- APPLAUSE -->
+<div class="applause" id="applause">
+  <div class="applause-card">
+    <div class="clap-row"><span>👏</span><span>👏</span><span>👏</span></div>
+    <b>Cảm ơn bạn đã chia sẻ!</b>
+    <span class="sub" id="applauseSub">Lượt tiếp theo nhé</span>
+  </div>
+</div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script>
+(function(){
+  "use strict";
+
+  var QUESTIONS = [
+    "Một khoảnh khắc nào bạn thấy tự hào về tác phong, hình ảnh của team mình trong mắt phụ huynh/khách hàng?",
+    "Nếu một phụ huynh/đối tác ghé văn phòng bất chợt vào lúc này, bạn nghĩ họ sẽ thấy một SUNNYCARE – METTASOUL như thế nào?",
+    "Điều gì khiến bạn đôi khi khó giữ đúng giờ giấc, trang phục hay sự gọn gàng trong công việc?",
+    "Trước khi bắt đầu một ngày làm việc, điều gì giúp bạn cảm thấy mình đã thực sự sẵn sàng — cả về tinh thần lẫn hình ảnh bên ngoài?",
+    "Nếu được chọn MỘT điều nhỏ để tự mình cải thiện về tác phong/trách nhiệm trong thời gian tới, bạn chọn điều gì?",
+    "Bạn muốn SUNNYCARE – METTASOUL được nhớ đến như một nơi làm việc như thế nào — qua chính cách team mình xuất hiện mỗi ngày?",
+    "Khi mới vào team hoặc mới chuyển sang văn phòng/vị trí làm việc hiện tại, điều gì giúp bạn cảm thấy nhanh \"hòa nhịp\" với mọi người nhất?",
+    "Có điều gì ở cách tổ chức công việc hiện tại (giờ giấc, không gian, nhịp sinh hoạt chung...) mà bạn nghĩ nếu điều chỉnh một chút sẽ giúp cả team thoải mái và gắn kết hơn?",
+    "Bạn nhớ một khoảnh khắc nào đó đồng nghiệp đã âm thầm hỗ trợ mình trong công việc không? Điều đó khiến bạn cảm nhận gì về team?",
+    "Nếu có một điều bạn muốn nhắn gửi nhẹ nhàng tới cả team — không phải để nhắc nhở ai, mà để cùng nhau tốt hơn — đó sẽ là điều gì?",
+    "Theo bạn, điều gì làm nên sự khác biệt giữa một \"nơi mình đi làm\" và một \"nơi mình thuộc về\"?"
+  ];
+  var BRAINSTORM_SECONDS = 30;
+  var ANSWER_SECONDS = 120;
+  var STEP_ORDER = ["welcome","warmup","rules","board","closing"];
+
+  var state = {
+    done:new Array(QUESTIONS.length).fill(false),
+    current:null, phase:null, remaining:0, paused:false, timerId:null, stage:"reveal"
+  };
+
+  /* ---------------- navigation ---------------- */
+  function goTo(id){
+    STEP_ORDER.forEach(function(s){
+      var el = document.getElementById("screen-"+s);
+      if(el) el.classList.toggle("active", s===id);
+    });
+    document.querySelectorAll("#steps i").forEach(function(dot){
+      var s = dot.getAttribute("data-step");
+      var idx = STEP_ORDER.indexOf(s), curIdx = STEP_ORDER.indexOf(id);
+      dot.classList.toggle("on", s===id);
+      dot.classList.toggle("done", idx>-1 && idx<curIdx && s!=="board");
+    });
+    setTrackFor(id);
+    window.scrollTo(0,0);
+  }
+  window.goTo = goTo;
+
+  /* ---------------- board ---------------- */
+  function buildBoard(){
+    var board = document.getElementById("board");
+    board.innerHTML = "";
+    QUESTIONS.forEach(function(q,i){
+      var tile = document.createElement("div");
+      tile.className = "tile";
+      tile.id = "tile-"+i;
+      tile.innerHTML =
+        '<button class="face front" onclick="openQuestion('+i+')">' +
+          '<span class="eb">Câu</span><span class="num">'+(i+1)+'</span>' +
+        '</button>' +
+        '<button class="face back" onclick="openQuestion('+i+')" tabindex="-1">' +
+          '<b>Đã mở</b><span>'+truncate(q,54)+'</span>' +
+        '</button>' +
+        '<div class="check">✓</div>';
+      board.appendChild(tile);
+    });
+    var deco = document.createElement("div");
+    deco.className = "tile";
+    deco.innerHTML = '<div class="logo-tile"><b>SUNNYCARE · METTASOUL</b><span>Circle Time 🌿</span></div>';
+    board.appendChild(deco);
+    updateProgress();
+  }
+  function truncate(s,n){ return s.length>n ? s.slice(0,n-1)+"…" : s; }
+  function updateProgress(){
+    var doneCount = state.done.filter(Boolean).length;
+    var pct = Math.round((doneCount/QUESTIONS.length)*100);
+    document.getElementById("progressRing").style.setProperty("--pct", pct);
+    document.getElementById("progressText").textContent = doneCount+"/"+QUESTIONS.length;
+    document.getElementById("boardFooter").style.display = (doneCount===QUESTIONS.length) ? "flex" : "none";
+  }
+
+  /* ---------------- question overlay: reveal -> question ---------------- */
+  window.openQuestion = function(i){
+    if(state.done[i]) return;
+    var tile = document.getElementById("tile-"+i);
+    tile.classList.add("flipped");
+    uiPop();
+    state.current = i;
+    setTimeout(function(){
+      document.getElementById("overlay").classList.add("show");
+      renderReveal(i);
+      cheerSound(); burstConfetti();
+    }, 420);
+  };
+
+  function renderReveal(i){
+    state.stage = "reveal";
+    clearInterval(state.timerId);
+    var panel = document.getElementById("panelInner");
+    panel.innerHTML =
+      '<div class="panel-top"><span></span><button class="close-x" aria-label="Đóng" onclick="closeOverlay()">✕</button></div>' +
+      '<div class="reveal-wrap">' +
+        '<div class="reveal-eyebrow">Số của bạn là</div>' +
+        '<div class="reveal-num">'+(i+1)+'</div>' +
+        '<div class="reveal-sub">Đây là con số bạn vừa bốc được — ứng với câu hỏi số '+(i+1)+' trên bảng.</div>' +
+        '<div class="btnrow" style="margin-top:8px;"><button class="btn btn-primary" onclick="revealQuestion()">Xem câu hỏi 👀</button></div>' +
+      '</div>';
+  }
+
+  window.revealQuestion = function(){
+    var i = state.current;
+    state.stage = "question";
+    var panel = document.getElementById("panelInner");
+    panel.innerHTML =
+      '<div class="panel-top"><span class="q-badge">CÂU '+(i+1)+'</span><button class="close-x" aria-label="Đóng" onclick="closeOverlay()">✕</button></div>' +
+      '<p class="q-text">'+QUESTIONS[i]+'</p>' +
+      '<div class="phase" id="phaseBox" style="--ring:var(--orange);">' +
+        '<div class="tring" id="tring" style="--p:0;"><span class="time" id="timeLabel">0:30</span></div>' +
+        '<div class="meta"><b id="phaseTitle">Suy nghĩ nhanh</b><span id="phaseSub">30 giây để gom ý tưởng trong đầu</span></div>' +
+      '</div>' +
+      '<div class="note-hint">📝 Có thể ghi nhanh ý vào sổ tay hoặc giấy note được phát, để lúc chia sẻ không quên ý.</div>' +
+      '<div class="panel-actions">' +
+        '<button class="btn btn-ghost btn-sm" id="pauseBtn" onclick="togglePause()">Tạm dừng</button>' +
+        '<button class="btn btn-ghost btn-sm" onclick="skipPhase()" id="skipBtn">Bỏ qua suy nghĩ, chia sẻ ngay</button>' +
+        '<button class="btn btn-primary btn-sm" onclick="finishTurn()">HOÀN TẤT</button>' +
+      '</div>';
+    startPhase("brainstorm");
+  };
+
+  function startPhase(phase){
+    clearInterval(state.timerId);
+    state.phase = phase; state.paused = false;
+    document.getElementById("pauseBtn").textContent = "Tạm dừng";
+    var box = document.getElementById("phaseBox");
+    var skipBtn = document.getElementById("skipBtn");
+    if(phase==="brainstorm"){
+      state.remaining = BRAINSTORM_SECONDS;
+      box.style.setProperty("--ring","var(--orange)");
+      document.getElementById("phaseTitle").textContent = "Suy nghĩ nhanh";
+      document.getElementById("phaseSub").textContent = "30 giây để gom ý tưởng trong đầu";
+      skipBtn.style.display = "inline-flex";
+      skipBtn.textContent = "Bỏ qua suy nghĩ, chia sẻ ngay";
+    } else {
+      state.remaining = ANSWER_SECONDS;
+      box.style.setProperty("--ring","var(--blue)");
+      document.getElementById("phaseTitle").textContent = "Chia sẻ";
+      document.getElementById("phaseSub").textContent = "Tối đa 2 phút cho phần chia sẻ";
+      skipBtn.style.display = "none";
+    }
+    renderTimer(phase==="brainstorm"?BRAINSTORM_SECONDS:ANSWER_SECONDS);
+    tick();
+    state.timerId = setInterval(tick,1000);
+  }
+  function tick(){
+    if(state.paused) return;
+    var total = state.phase==="brainstorm"?BRAINSTORM_SECONDS:ANSWER_SECONDS;
+    renderTimer(state.remaining);
+    var pct = Math.round(((total-state.remaining)/total)*100);
+    document.getElementById("tring").style.setProperty("--p",pct);
+    if(state.remaining<=0){
+      clearInterval(state.timerId);
+      if(state.phase==="brainstorm") startPhase("answer"); else finishTurn();
+      return;
+    }
+    state.remaining--;
+  }
+  function renderTimer(sec){
+    var m=Math.floor(sec/60), s=sec%60;
+    var el = document.getElementById("timeLabel");
+    if(el) el.textContent = m+":"+(s<10?"0":"")+s;
+  }
+  window.togglePause = function(){
+    state.paused = !state.paused;
+    document.getElementById("pauseBtn").textContent = state.paused?"Tiếp tục":"Tạm dừng";
+  };
+  window.skipPhase = function(){
+    if(state.phase==="brainstorm"){ clearInterval(state.timerId); startPhase("answer"); }
+  };
+  window.closeOverlay = function(){
+    clearInterval(state.timerId);
+    document.getElementById("overlay").classList.remove("show");
+    if(state.current!=null && !state.done[state.current]){
+      document.getElementById("tile-"+state.current).classList.remove("flipped");
+    }
+    state.current = null;
+  };
+  window.finishTurn = function(){
+    clearInterval(state.timerId);
+    var i = state.current;
+    document.getElementById("overlay").classList.remove("show");
+    if(i!=null){
+      state.done[i]=true;
+      document.getElementById("tile-"+i).classList.add("done");
+      updateProgress();
+    }
+    showApplause();
+    state.current = null;
+  };
+
+  function showApplause(){
+    var el = document.getElementById("applause");
+    var doneCount = state.done.filter(Boolean).length;
+    var left = QUESTIONS.length - doneCount;
+    document.getElementById("applauseSub").textContent =
+      left>0 ? "Còn "+left+" câu nữa — tiếp tục bốc thăm nhé" : "Cả 11 câu đã được chia sẻ 🎉";
+    el.classList.add("show");
+    mascotCheer(true);
+    applauseSound();
+    burstConfetti();
+    setTimeout(function(){ el.classList.remove("show"); mascotCheer(false); }, 1700);
+  }
+
+  window.resetAll = function(){
+    state.done = new Array(QUESTIONS.length).fill(false);
+    state.current = null;
+    clearInterval(state.timerId);
+    buildBoard();
+    goTo("welcome");
+  };
+
+  /* ---------------- mascot ---------------- */
+  function mascotCheer(on){
+    var el = document.getElementById("mascot");
+    el.classList.toggle("cheer", !!on);
+  }
+
+  /* =================================================================
+     AUDIO ENGINE — nhạc nền + hiệu ứng tổng hợp bằng Web Audio
+     (không tải file âm thanh ngoài — tất cả được tạo tại chỗ)
+  ================================================================= */
+  var AC=null, MASTER=null, COMP=null, noiseBuf=null, soundOn=true, musicOn=true;
+  function ctx(){
+    if(!AC){
+      try{
+        AC = new (window.AudioContext||window.webkitAudioContext)();
+        /* master limiter: chống rè/vỡ tiếng khi nhạc + hiệu ứng chồng lên nhau */
+        var comp = AC.createDynamicsCompressor();
+        comp.threshold.value = -14; comp.knee.value = 8; comp.ratio.value = 12;
+        comp.attack.value = .003; comp.release.value = .2;
+        var makeup = AC.createGain(); makeup.gain.value = 1.4;
+        comp.connect(makeup).connect(AC.destination);
+        COMP = comp;
+        /* bus riêng cho hiệu ứng: luôn to, rõ hơn nhạc nền */
+        MASTER = AC.createGain(); MASTER.gain.value = 1.6; MASTER.connect(comp);
+        noiseBuf = AC.createBuffer(1, AC.sampleRate*1.2, AC.sampleRate);
+        var d = noiseBuf.getChannelData(0);
+        for(var i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+      }catch(e){ AC=null; }
+    }
+    if(AC && AC.state==="suspended") AC.resume();
+    return AC;
+  }
+  /* khi có hiệu ứng: nhạc nền tự hạ xuống rồi trở lại, để hiệu ứng luôn nổi bật */
+  function duck(){
+    if(!MUS.bus || !AC) return;
+    var g=MUS.bus.gain, now=AC.currentTime;
+    g.cancelScheduledValues(now); g.setValueAtTime(g.value,now);
+    g.linearRampToValueAtTime(MUS_LEVEL*.3, now+.06);
+    g.setValueAtTime(MUS_LEVEL*.3, now+1.1);
+    g.linearRampToValueAtTime(MUS_LEVEL, now+1.9);
+  }
+  function audioOut(){ var a=ctx(); if(!soundOn) return null; duck(); return a; }
+
+  function env(g,t,a,peak,end){ g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(peak,t+a); g.gain.exponentialRampToValueAtTime(.0001,end); }
+  function clapHit(ac,t,vol){
+    var src=ac.createBufferSource(); src.buffer=noiseBuf;
+    var bp=ac.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=900+Math.random()*1800; bp.Q.value=1.2;
+    var g=ac.createGain();
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+.003); g.gain.exponentialRampToValueAtTime(.0008,t+.09+Math.random()*.05);
+    src.connect(bp).connect(g).connect(MASTER);
+    src.start(t, Math.random()*.6, .16);
+  }
+  function applauseSound(dur){
+    dur = dur || 1.8;
+    var ac=audioOut(); if(!ac) return;
+    var now=ac.currentTime, n=Math.floor(dur*55);
+    for(var i=0;i<n;i++){
+      var p=Math.random(), t=now+p*dur;
+      var e=Math.min(1,p*5)*(1-Math.pow(p,2.2));
+      clapHit(ac,t,.2*e+.02);
+    }
+  }
+  function cheerSound(){
+    var ac=audioOut(); if(!ac) return;
+    [660,880,990].forEach(function(f,i){
+      var t=ac.currentTime+i*.08, o=ac.createOscillator(), g=ac.createGain();
+      o.type="sine"; o.frequency.value=f;
+      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.14,t+.02); g.gain.exponentialRampToValueAtTime(.0005,t+.75);
+      o.connect(g).connect(MASTER); o.start(t); o.stop(t+.8);
+    });
+  }
+  function tickSound(){
+    var ac=audioOut(); if(!ac) return;
+    var t=ac.currentTime, o=ac.createOscillator(), g=ac.createGain();
+    o.type="triangle"; o.frequency.value=1500;
+    g.gain.setValueAtTime(.06,t); g.gain.exponentialRampToValueAtTime(.0005,t+.04);
+    o.connect(g).connect(MASTER); o.start(t); o.stop(t+.05);
+  }
+  function uiClick(){
+    var ac=audioOut(); if(!ac) return;
+    var t=ac.currentTime, o=ac.createOscillator(), g=ac.createGain();
+    o.type="sine"; o.frequency.setValueAtTime(980,t); o.frequency.exponentialRampToValueAtTime(680,t+.09);
+    g.gain.setValueAtTime(.001,t); g.gain.linearRampToValueAtTime(.09,t+.012); g.gain.exponentialRampToValueAtTime(.0004,t+.13);
+    o.connect(g).connect(MASTER); o.start(t); o.stop(t+.14);
+  }
+  function uiPop(){
+    var ac=audioOut(); if(!ac) return;
+    [0,.05].forEach(function(dt,i){
+      var t=ac.currentTime+dt, o=ac.createOscillator(), g=ac.createGain();
+      o.type="sine"; o.frequency.value = i===0?740:1040;
+      g.gain.setValueAtTime(.001,t); g.gain.linearRampToValueAtTime(.1,t+.012); g.gain.exponentialRampToValueAtTime(.0004,t+.16);
+      o.connect(g).connect(MASTER); o.start(t); o.stop(t+.18);
+    });
+  }
+
+  /* ---- synth helpers for ambient loops ---- */
+  function mf(m){ return 440*Math.pow(2,(m-69)/12); }
+  function iKeys(o,f,t,d,v){
+    var ac=AC, g=ac.createGain(); env(g,t,.012,v,t+d); g.connect(o);
+    [[1,1],[2,.25],[3,.07]].forEach(function(pair){
+      var x=ac.createOscillator(), xg=ac.createGain();
+      x.type="sine"; x.frequency.value=f*pair[0]; xg.gain.value=pair[1];
+      x.connect(xg).connect(g); x.start(t); x.stop(t+d+.05);
+    });
+  }
+  function iPad(o,notes,t,d,v){
+    var ac=AC, lp=ac.createBiquadFilter(), g=ac.createGain();
+    lp.type="lowpass"; lp.frequency.value=1000;
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(v,t+Math.min(2,d*.3));
+    g.gain.setValueAtTime(v,t+d*.7); g.gain.linearRampToValueAtTime(0,t+d);
+    lp.connect(g).connect(o);
+    notes.forEach(function(n){
+      [-6,6].forEach(function(dt){
+        var x=ac.createOscillator(); x.type="triangle"; x.frequency.value=mf(n); x.detune.value=dt;
+        x.connect(lp); x.start(t); x.stop(t+d+.1);
+      });
+    });
+  }
+  function iBass(o,f,t,d,v){
+    var ac=AC, x=ac.createOscillator(), lp=ac.createBiquadFilter(), g=ac.createGain();
+    x.type="sine"; x.frequency.value=f; lp.type="lowpass"; lp.frequency.value=480;
+    env(g,t,.01,v,t+d); x.connect(lp).connect(g).connect(o); x.start(t); x.stop(t+d+.05);
+  }
+  function iKick(o,t,v){
+    var ac=AC, x=ac.createOscillator(), g=ac.createGain();
+    x.frequency.setValueAtTime(130,t); x.frequency.exponentialRampToValueAtTime(42,t+.14);
+    env(g,t,.004,v,t+.32); x.connect(g).connect(o); x.start(t); x.stop(t+.35);
+  }
+  function iPluck(o,f,t,d,v){
+    var ac=AC, x=ac.createOscillator(), lp=ac.createBiquadFilter(), g=ac.createGain();
+    x.type="triangle"; x.frequency.value=f; lp.type="lowpass"; lp.frequency.setValueAtTime(2600,t);
+    lp.frequency.exponentialRampToValueAtTime(700,t+d);
+    env(g,t,.005,v,t+d); x.connect(lp).connect(g).connect(o); x.start(t); x.stop(t+d+.05);
+  }
+
+  function iShaker(o,t,v){
+    var ac=AC, src=ac.createBufferSource(); src.buffer=noiseBuf;
+    var hp=ac.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=5000;
+    var g=ac.createGain(); env(g,t,.002,v,t+.05);
+    src.connect(hp).connect(g).connect(o); src.start(t,Math.random()*.5,.06);
+  }
+  var TRACKS = {
+    gentle:{ bpm:86, vol:.85, play:function(st,t,o){
+      var prog=[[60,64,67],[57,60,64],[53,57,60],[55,59,62]], ch=prog[Math.floor(st/16)%4], s=st%16;
+      if(s===0){ iPad(o,ch.map(function(n){return n-12;}),t,16*(60/86/4)+1.2,.05); iBass(o,mf(ch[0]-24),t,3.2,.07); }
+      if(s%4===0) iPluck(o,mf(ch[(s/4)%ch.length]+12),t,.9,.07);
+      if(s%2===1) iPluck(o,mf(ch[(Math.floor(s/2))%ch.length]+24),t,.5,.03);
+      if(s%8===6 && Math.random()<.85) iKeys(o,mf(ch[(s/2)%ch.length]+24),t,1.4,.045);
+    }},
+    active:{ bpm:100, vol:.85, play:function(st,t,o){
+      var prog=[[60,64,67],[57,60,64],[53,57,60],[55,59,62]], ch=prog[Math.floor(st/16)%4], s=st%16;
+      var mel=[0,2,1,2,0,1,2,1];
+      if(s===0){ iPad(o,ch.map(function(n){return n-12;}),t,16*(60/100/4)+.2,.035); iBass(o,mf(ch[0]-24),t,1.2,.14); iKick(o,t,.2); }
+      if(s===8){ iBass(o,mf(ch[0]-24),t,1.0,.12); iKick(o,t,.14); }
+      if(s%4===0) iKeys(o,mf(ch[mel[(s/4)%8]]+12),t,1.0,.06);
+      if(s===6 || s===14) iKeys(o,mf(ch[(s===6?1:2)]+24),t,.7,.035);
+    }},
+    cheer:{ bpm:120, vol:.85, play:function(st,t,o){
+      var prog=[[60,64,67],[57,60,64],[53,57,60],[55,59,62]], ch=prog[Math.floor(st/16)%4], s=st%16;
+      if(s%4===0) iKick(o,t,.3);
+      if(s%8===0) iBass(o,mf(ch[0]-24),t,.9,.15);
+      if(s%2===0) iPluck(o,mf(ch[(s/2)%ch.length]+12),t,.4,.05);
+      if(s===0) ch.forEach(function(n){ iKeys(o,mf(n+12),t,1.2,.04); });
+    }}
+  };
+  var MUS_LEVEL = .7;
+  var MUS = { on:true, started:false, want:"gentle", name:null, track:null, out:null, bus:null, next:0, step:0, timer:null };
+  function musicStart(){
+    if(MUS.started || !MUS.on) return;
+    var ac=ctx(); if(!ac) return;
+    MUS.started = true;
+    MUS.bus = ac.createGain(); MUS.bus.gain.value=MUS_LEVEL; MUS.bus.connect(COMP);
+    MUS.timer = setInterval(musicTick,25);
+    var w=MUS.want; MUS.name=null; if(w) setTrack(w);
+  }
+  function musicTick(){
+    if(!MUS.track || !AC) return;
+    var sd = 60/MUS.track.bpm/4;
+    if(MUS.next < AC.currentTime) MUS.next = AC.currentTime+.05;
+    while(MUS.next < AC.currentTime+.2){ MUS.track.play(MUS.step, MUS.next, MUS.out); MUS.next+=sd; MUS.step++; }
+  }
+  function setTrack(name){
+    MUS.want = name;
+    if(!MUS.started || !MUS.on || MUS.name===name) return;
+    var ac=AC, now=ac.currentTime;
+    if(MUS.out){
+      var old=MUS.out; old.gain.cancelScheduledValues(now); old.gain.setValueAtTime(old.gain.value,now);
+      old.gain.linearRampToValueAtTime(0,now+1.2); setTimeout(function(){ old.disconnect(); },6000);
+    }
+    var tr=TRACKS[name], g=ac.createGain();
+    g.gain.setValueAtTime(0,now); g.gain.linearRampToValueAtTime(tr.vol,now+1.6); g.connect(MUS.bus);
+    MUS.out=g; MUS.track=tr; MUS.name=name; MUS.step=0; MUS.next=now+.1;
+  }
+  function musicStop(){
+    if(!MUS.out || !AC) return;
+    var old=MUS.out, now=AC.currentTime;
+    old.gain.cancelScheduledValues(now); old.gain.setValueAtTime(old.gain.value,now); old.gain.linearRampToValueAtTime(0,now+.7);
+    setTimeout(function(){ old.disconnect(); },6000);
+    MUS.out=null; MUS.track=null; MUS.name=null;
+  }
+  function setTrackFor(screenId){
+    var map = { welcome:"gentle", warmup:"gentle", rules:"gentle", board:"active", closing:"cheer" };
+    setTrack(map[screenId] || "gentle");
+  }
+  addEventListener("pointerdown", musicStart, { once:false });
+  addEventListener("keydown", musicStart, { once:false });
+
+  /* generic UI click sound on every button/tile/control tap */
+  addEventListener("click", function(e){
+    var el = e.target.closest(".btn, .chip-btn, .close-x, .tile button.face");
+    if(!el) return;
+    if(el.classList.contains("face")) return; /* tile open already has its own reveal sound */
+    uiClick();
+  }, true);
+
+  var musicBtn = document.getElementById("musicBtn");
+  musicBtn.addEventListener("click", function(){
+    MUS.on = !MUS.on;
+    musicBtn.setAttribute("aria-pressed", MUS.on);
+    musicBtn.textContent = "Nhạc nền: "+(MUS.on?"bật":"tắt");
+    if(MUS.on){ if(!MUS.started) musicStart(); else { var w=MUS.want; MUS.name=null; setTrack(w); } }
+    else musicStop();
+  });
+  var soundBtn = document.getElementById("soundBtn");
+  soundBtn.addEventListener("click", function(){
+    soundOn = !soundOn;
+    soundBtn.setAttribute("aria-pressed", soundOn);
+    soundBtn.textContent = "Hiệu ứng: "+(soundOn?"bật":"tắt");
+    if(soundOn) cheerSound();
+  });
+
+  /* ---------------- confetti ---------------- */
+  var cf=document.getElementById("confetti"), cx2=cf.getContext("2d");
+  var parts=[], cfRun=false;
+  var reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function burstConfetti(){
+    if(reduceMotion) return;
+    if(!cfRun){ cf.width=innerWidth*devicePixelRatio; cf.height=innerHeight*devicePixelRatio; }
+    var cols=["#D98C22","#1F93AC","#F6DFAF","#CFEAEF","#4C9A6A"];
+    for(var i=0;i<90;i++){
+      parts.push({
+        x: cf.width/2+(Math.random()-.5)*cf.width*.4, y: cf.height*.42,
+        vx:(Math.random()-.5)*18, vy:-Math.random()*20-8,
+        r:Math.random()*Math.PI, vr:(Math.random()-.5)*.3,
+        w:(5+Math.random()*7)*devicePixelRatio, h:(3+Math.random()*4)*devicePixelRatio,
+        c: cols[i%cols.length], life:0
+      });
+    }
+    if(!cfRun){ cfRun=true; requestAnimationFrame(cfStep); }
+  }
+  function cfStep(){
+    cx2.clearRect(0,0,cf.width,cf.height);
+    parts.forEach(function(p){
+      p.vy += .8; p.vx *= .985; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life++;
+      cx2.save(); cx2.translate(p.x,p.y); cx2.rotate(p.r);
+      cx2.fillStyle=p.c; cx2.fillRect(-p.w/2,-p.h/2,p.w,p.h); cx2.restore();
+      if(p.y > cf.height+40 || p.life>220) p.dead=true;
+    });
+    parts = parts.filter(function(p){ return !p.dead; });
+    if(parts.length) requestAnimationFrame(cfStep); else { cfRun=false; cx2.clearRect(0,0,cf.width,cf.height); }
+  }
+  addEventListener("resize", function(){ if(cfRun){ cf.width=innerWidth*devicePixelRatio; cf.height=innerHeight*devicePixelRatio; } });
+
+  /* ---------------- boot ---------------- */
+  function boot(){ buildBoard(); goTo("welcome"); }
+  if(window.claude && window.claude.hot){
+    window.claude.hot.snapshot(function(){ return { done: state.done }; });
+    if(window.claude.hot.ready){
+      window.claude.hot.ready(function(data){
+        if(data && data.done && data.done.length===QUESTIONS.length) state.done = data.done;
+        boot();
+      });
+    } else { boot(); }
+  } else { boot(); }
+})();
+</script>
+
+</html>
