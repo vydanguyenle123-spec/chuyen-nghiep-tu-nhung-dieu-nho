@@ -1,0 +1,1114 @@
+<title>Chinh Phục Everest</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Be+Vietnam+Pro:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Palette: đêm núi tuyết, băng trắng, và năm màu cờ cầu nguyện */
+/* Layout: một cột leo dọc, mỗi trại là một chặng đánh số La Mã */
+:root {
+  --sky-a: #04080f;
+  --sky-b: #10254a;
+  --snow: #eef5fb;
+  --mist: #94adc4;
+  --line: rgba(150, 185, 220, 0.2);
+  --panel: rgba(14, 30, 56, 0.8);
+  --flag-blue: #3b82d6;
+  --flag-white: #f4f8fb;
+  --flag-red: #d6373f;
+  --flag-green: #2fa36b;
+  --flag-yellow: #f2c14e;
+  --accent: var(--flag-yellow);
+  color-scheme: dark;
+}
+body {
+  margin: 0;
+  min-height: 100%;
+  font: 17px/1.55 "Be Vietnam Pro", system-ui, sans-serif;
+  color: var(--snow);
+  background-color: var(--sky-a);
+  background: linear-gradient(180deg, var(--sky-a) 0%, var(--sky-b) 100%) fixed;
+  padding-block: 20px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+#app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; }
+/* Nền: dãy núi Everest, cố định phía sau xuyên suốt trang */
+.bg-everest {
+  position: fixed; left: 0; bottom: 0; width: 100%; height: 100%;
+  z-index: 0; pointer-events: none; opacity: 0.6;
+}
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button { font: inherit; }
+
+.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.eyebrow { margin: 0; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mist); }
+h1 { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 700; font-size: 46px; line-height: 1.05; margin: 4px 0 0; text-wrap: balance; }
+h2 { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 700; font-size: 40px; line-height: 1.1; margin: 4px 0 0; text-wrap: balance; }
+.toggles { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.chip {
+  border: 1px solid var(--line); background: transparent; color: var(--mist);
+  padding: 8px 14px; border-radius: 999px; font-size: 14px; cursor: pointer;
+}
+.chip.on { color: var(--sky-a); background: var(--accent); border-color: var(--accent); }
+.mode { margin: 8px 0 0; font-size: 15px; color: var(--flag-green); }
+
+.meter { margin: 22px 0 16px; }
+.meter-bar { height: 6px; border-radius: 99px; background: rgba(150, 185, 220, 0.15); overflow: hidden; }
+.meter-bar span {
+  display: block; height: 100%; width: var(--w);
+  background: linear-gradient(90deg, var(--flag-blue), var(--flag-white), var(--flag-yellow));
+  transition: width 0.6s ease;
+}
+.meter p { margin: 8px 0 0; font-size: 15px; color: var(--mist); }
+.summit { margin: 0 0 12px; font-family: "Cormorant Garamond", serif; font-size: 26px; color: var(--flag-yellow); }
+
+.route { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.camp { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.camp.locked { opacity: 0.45; }
+.camp.open { border-color: var(--accent); }
+.camp.done { border-color: rgba(47, 163, 107, 0.6); }
+.camp-btn {
+  display: grid; gap: 2px; width: 100%; text-align: left; padding: 14px 16px;
+  background: none; border: 0; color: inherit; cursor: pointer;
+}
+.camp-btn:disabled { cursor: default; }
+.alt { font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--accent); letter-spacing: 0.04em; }
+.name { font-family: "Cormorant Garamond", serif; font-size: 27px; font-weight: 700; }
+.roman { display: inline-block; min-width: 2.2em; color: var(--accent); margin-right: 6px; }
+.ch { color: var(--mist); font-size: 16px; }
+.camp .fact {
+  margin: 0; padding: 10px 16px 14px; color: var(--mist); font-size: 16px;
+  border-top: 1px solid var(--line);
+}
+.foot { margin-top: 22px; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.foot p { margin: 0; font-size: 15px; color: var(--mist); text-align: center; }
+
+.ghost {
+  background: transparent; color: var(--mist); border: 1px solid var(--line);
+  border-radius: 10px; padding: 8px 14px; cursor: pointer;
+}
+.ghost:disabled { opacity: 0.4; cursor: default; }
+.primary {
+  background: var(--accent); color: var(--sky-a); border: 0; border-radius: 10px;
+  padding: 10px 18px; font-weight: 700; cursor: pointer;
+}
+.row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+
+.stage { margin-top: 14px; text-align: center; }
+.desc { color: var(--mist); max-width: 40ch; margin: 8px auto 18px; }
+.lore {
+  font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 22px; line-height: 1.5;
+  color: var(--snow); max-width: 36ch; margin: 10px auto 0; text-wrap: pretty;
+}
+.prologue {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+  padding: 12px 16px; margin: 0 0 16px;
+}
+.prologue summary { cursor: pointer; font-family: "Cormorant Garamond", serif; font-size: 26px; font-weight: 700; color: var(--accent); }
+.prologue p { margin: 10px 0 0; color: var(--snow); }
+.prologue ol { margin: 10px 0 0; padding-left: 20px; color: var(--mist); }
+.prologue li { margin-bottom: 6px; }
+.board { display: flex; justify-content: center; align-items: center; min-height: 300px; }
+.status {
+  min-height: 1.5em; margin: 12px 0; font-family: "JetBrains Mono", monospace;
+  font-size: 16px; color: var(--accent);
+}
+.result {
+  margin-top: 12px; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 14px; padding: 16px; text-align: center;
+}
+.result.win { border-color: var(--flag-green); }
+.result.fail { border-color: var(--flag-red); }
+.result p { margin: 0 0 6px; }
+.fact-big { font-size: 20px; color: var(--snow); }
+
+/* Đồng hồ và bộ đếm lượt, đặt song song */
+.meters { display: flex; gap: 12px; width: min(340px, 88vw); margin: 0 auto 12px; }
+.panel {
+  flex: 1 1 0; min-width: 0; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 12px; padding: 10px 12px; text-align: left;
+}
+.pl { margin: 0 0 6px; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mist); }
+.pv { margin: 6px 0 0; font-family: "JetBrains Mono", monospace; font-size: 16px; color: var(--mist); }
+.timer-bar { height: 6px; border-radius: 99px; background: rgba(150, 185, 220, 0.15); overflow: hidden; }
+.timer-bar span {
+  display: block; height: 100%; width: 100%; background: var(--flag-green);
+  transition: width 0.1s linear, background 0.3s;
+}
+.timer-bar span.low { background: var(--flag-red); }
+.turn-track { display: flex; align-items: baseline; gap: 6px; font-family: "JetBrains Mono", monospace; }
+.turn-track span { font-size: 40px; font-weight: 700; color: var(--accent); transition: color 0.3s; }
+.turn-track span.low { color: var(--flag-red); }
+.turn-track small { color: var(--mist); font-size: 16px; }
+
+/* Trò 1: chuỗi cờ */
+.seq { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; }
+.pad {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;
+  width: min(300px, 84vw); margin: 0 auto;
+}
+.tile {
+  flex: 0 0 calc((100% - 24px) / 3); aspect-ratio: 1; border-radius: 18px; border: 0;
+  background: var(--c); opacity: 0.45; cursor: pointer; touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s, transform 0.12s, box-shadow 0.15s, outline-color 0.15s;
+}
+.tile:active { transform: scale(0.94); }
+.tile.lit { opacity: 1; transform: scale(1.03); box-shadow: 0 0 24px var(--c); }
+.pad.ready .tile { opacity: 0.85; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.18); }
+.tile.hint { opacity: 1; outline: 3px solid var(--flag-white); outline-offset: 3px; }
+.pips { display: flex; gap: 8px; justify-content: center; margin-top: 14px; }
+.pips span { width: 10px; height: 10px; border-radius: 50%; border: 1px solid var(--line); transition: background 0.2s; }
+.pips span.on { background: var(--accent); border-color: var(--accent); }
+.tools { display: flex; justify-content: center; margin-top: 12px; }
+.tip { font-size: 15px; color: var(--mist); margin: 10px auto 0; max-width: 34ch; }
+
+/* Trò 2: cặp băng */
+.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: min(320px, 86vw); }
+.card {
+  position: relative; aspect-ratio: 3 / 4; border-radius: 10px; border: 1px solid var(--line);
+  background: linear-gradient(160deg, #1b3a66, #0c1d36); color: var(--mist); cursor: pointer; padding: 0;
+}
+.card .back { position: absolute; inset: 0; display: grid; place-items: center; font-size: 18px; }
+.card .front {
+  position: absolute; inset: 0; display: none; place-items: center; font-size: 24px;
+  background: rgba(238, 245, 251, 0.96); border-radius: 10px;
+}
+.card.up .front { display: grid; }
+.card.up .back { display: none; }
+.card.gone { visibility: hidden; }
+
+/* Trò 3: ký hiệu lặp lại */
+.nb { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.nb-letter {
+  width: 150px; height: 150px; border-radius: 24px; display: grid; place-items: center;
+  font-family: "Cormorant Garamond", serif; font-size: 96px; font-weight: 700; color: var(--mist);
+  border: 1px solid var(--line); background: rgba(10, 22, 42, 0.6);
+}
+.nb-letter.show { color: var(--flag-yellow); border-color: var(--flag-yellow); }
+.nb-letter.ok { color: var(--flag-green); border-color: var(--flag-green); box-shadow: 0 0 22px rgba(47, 163, 107, 0.5); }
+.nb-letter.bad { color: var(--flag-red); border-color: var(--flag-red); box-shadow: 0 0 22px rgba(214, 55, 63, 0.5); }
+.hist { display: flex; gap: 12px; justify-content: center; }
+.hist div {
+  display: grid; gap: 2px; min-width: 110px; padding: 8px 12px; text-align: center;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--panel);
+}
+.hist div.ref { border-color: var(--flag-yellow); }
+.hist small { font-size: 13px; color: var(--mist); }
+.hist b { font-family: "Cormorant Garamond", serif; font-size: 34px; color: var(--snow); }
+.hist div.ref b { color: var(--flag-yellow); }
+.cue {
+  min-height: 1.2em; margin: 0 0 12px; font-family: "Cormorant Garamond", serif; font-weight: 700;
+  font-size: 44px; line-height: 1.2; color: var(--flag-yellow); opacity: 0; transition: opacity 0.2s;
+}
+.cue.show { opacity: 1; }
+.cue.rev.show { color: var(--flag-red); }
+.countdown {
+  font-family: "Cormorant Garamond", serif; font-weight: 700; font-size: 120px; line-height: 1;
+  color: var(--flag-yellow); text-shadow: 0 0 30px rgba(242, 193, 78, 0.45);
+}
+.nb-fb { min-height: 1.4em; margin: 0; font-family: "JetBrains Mono", monospace; font-size: 16px; color: var(--accent); }
+.big { padding: 18px 40px; font-size: 22px; letter-spacing: 0.1em; }
+.hint { color: var(--mist); font-size: 16px; margin: 0; max-width: 30ch; }
+
+/* Trò 4: dãy số */
+.dshow {
+  font-family: "JetBrains Mono", monospace; font-size: clamp(26px, 8vw, 40px);
+  letter-spacing: 0.1em; color: var(--flag-yellow); padding: 28px 14px; min-width: 260px;
+  border: 1px dashed var(--line); border-radius: 16px;
+}
+.keys { display: grid; grid-template-columns: repeat(3, 72px); gap: 10px; margin-top: 16px; justify-content: center; }
+.key {
+  height: 56px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--panel); color: var(--snow); font-size: 24px; cursor: pointer;
+}
+
+/* Trò 5: bản đồ băng */
+.grid5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: min(300px, 84vw); }
+.cell {
+  aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--panel); cursor: pointer; padding: 0;
+}
+.cell.lit { background: var(--flag-blue); box-shadow: 0 0 18px var(--flag-blue); }
+.cell.pick { outline: 2px solid var(--flag-yellow); outline-offset: -2px; }
+.cell.miss { background: var(--flag-red); }
+
+/* Trò 6: câu hỏi về đỉnh */
+.q {
+  font-family: "Cormorant Garamond", serif; font-size: 32px; line-height: 1.25;
+  max-width: 22ch; margin: 0 auto 16px; text-wrap: balance;
+}
+.opts { display: grid; gap: 8px; width: min(340px, 86vw); }
+.opt {
+  padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--panel); color: var(--snow); text-align: left; cursor: pointer;
+}
+.opt.right { border-color: var(--flag-green); background: rgba(47, 163, 107, 0.25); }
+.opt.wrong { border-color: var(--flag-red); background: rgba(214, 55, 63, 0.25); }
+
+/* Hiệu ứng rung và nổ */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(4px); }
+}
+.shake { animation: shake 0.45s ease; }
+.boom { position: fixed; inset: 0; pointer-events: none; z-index: 50; display: grid; place-items: center; overflow: hidden; }
+.boom .flash {
+  position: absolute; inset: 0;
+  background: radial-gradient(circle, rgba(255, 210, 90, 0.95), rgba(214, 55, 63, 0.55) 35%, transparent 65%);
+  animation: boomFlash 0.6s ease-out forwards;
+}
+.boom .ring {
+  position: absolute; width: 40px; height: 40px; border-radius: 50%;
+  border: 3px solid var(--flag-yellow); animation: boomRing 0.8s ease-out forwards;
+}
+.boom i {
+  position: absolute; width: 10px; height: 10px; border-radius: 50%;
+  background: radial-gradient(var(--flag-yellow), var(--flag-red));
+  opacity: 0; animation: boomPart 0.9s cubic-bezier(0.1, 0.7, 0.3, 1) var(--d) forwards;
+}
+.boom-word {
+  position: relative; font-family: "Cormorant Garamond", serif; font-weight: 700;
+  font-size: clamp(48px, 16vw, 72px); color: var(--flag-yellow);
+  text-shadow: 0 0 22px var(--flag-red), 0 0 6px #000;
+  animation: boomWord 1.3s ease-out forwards;
+}
+@keyframes boomFlash { 0% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes boomRing { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(10); opacity: 0; } }
+@keyframes boomPart {
+  0% { transform: translate(0, 0) scale(1.2); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
+}
+@keyframes boomWord {
+  0% { transform: scale(0.3); opacity: 0; }
+  20% { transform: scale(1.15); opacity: 1; }
+  70% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+  .shake, .boom .flash, .boom .ring, .boom i, .boom-word { animation: none !important; }
+  .boom, .boom-word { display: none; }
+}
+</style>
+
+<svg class="bg-everest" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <defs>
+    <linearGradient id="rock" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a5288"/>
+      <stop offset="1" stop-color="#071427"/>
+    </linearGradient>
+  </defs>
+  <!-- Dãy núi: Lhotse và Nuptse ở hai bên, Everest ở giữa -->
+  <path fill="url(#rock)" d="M0 600 L120 430 L230 380 L330 300 L420 225 L500 140 L560 78 L600 30 L640 66 L690 122 L760 185 L830 245 L930 305 L1040 362 L1120 420 L1200 470 L1200 600 Z"/>
+  <!-- Mặt tuyết trên đỉnh Everest -->
+  <path fill="#e8f2fb" d="M600 30 L570 70 L588 62 L600 76 L614 60 L634 70 Z"/>
+  <!-- Mặt bóng tối bên trái đỉnh -->
+  <path fill="#06111f" opacity="0.45" d="M600 30 L540 150 L580 170 L555 260 L600 240 L585 340 L600 600 L520 600 L540 330 L500 260 L560 150 Z"/>
+</svg>
+<div id="app"></div>
+
+<script>
+const CAMPS = [
+  { roman: 'I', alt: '5.364 m', name: 'Base Camp', game: 'sequence', title: 'Chuỗi cờ',
+    desc: 'Ghi nhớ thứ tự các lá cờ cầu nguyện. Mỗi lượt chuỗi dài thêm một bước.',
+    fact: 'Nepal gọi đỉnh là Sagarmatha, còn Tây Tạng gọi là Chomolungma.' },
+  { roman: 'II', alt: 'khoảng 5.500 m', name: 'Thác băng Khumbu', game: 'pairs', title: 'Cặp băng',
+    desc: 'Lật thẻ để tìm các cặp giống nhau. Số lượt có hạn.',
+    fact: 'Thác băng Khumbu luôn chuyển động và băng có thể nứt bất ngờ, nên các đội thường vượt qua vào sáng sớm.' },
+  { roman: 'III', alt: 'khoảng 6.400 m', name: 'Thung lũng Western Cwm', game: 'nback', title: 'Ký hiệu lặp lại',
+    desc: 'Nhấn TRÙNG khi ký hiệu hiện tại giống ký hiệu cách đây 2 bước.',
+    fact: 'Everest vẫn nhô cao thêm vài milimét mỗi năm do mảng Ấn Độ va vào mảng Á-Âu.' },
+  { roman: 'IV', alt: 'khoảng 7.200 m', name: 'Sườn Lhotse', game: 'digits', title: 'Dãy số',
+    desc: 'Bạn chỉ được nhìn dãy số trong 3 giây, rồi nhập lại đúng thứ tự.',
+    fact: 'Trên khoảng 8.000 m là vùng tử thần, áp suất không khí chỉ còn khoảng một phần ba so với mực nước biển.' },
+  { roman: 'V', alt: 'khoảng 7.900 m', name: 'Yên Nam (South Col)', game: 'grid', title: 'Bản đồ băng',
+    desc: 'Bạn chỉ được nhìn các ô sáng trong 3 giây, rồi chạm lại đúng vị trí.',
+    fact: 'Ngày 29/5/1953, Edmund Hillary và Tenzing Norgay trở thành hai người đầu tiên được ghi nhận chinh phục đỉnh Everest.' },
+  { roman: 'VI', alt: '8.848,86 m', name: 'Đỉnh Everest', game: 'quiz', title: 'Trí nhớ đỉnh',
+    desc: 'Trả lời các câu hỏi về những gì bạn đã học trên đường lên. Phải đúng hết.',
+    fact: 'Năm 1975, Junko Tabei trở thành người phụ nữ đầu tiên chinh phục đỉnh Everest.' }
+];
+
+const QUIZ = [
+  { q: 'Nepal gọi đỉnh Everest là gì?', o: ['Sagarmatha', 'Kailash', 'Annapurna', 'Denali'], a: 0 },
+  { q: 'Đỉnh Everest được chinh phục lần đầu vào năm nào?', o: ['1935', '1953', '1975', '1978'], a: 1 },
+  { q: 'Người phụ nữ đầu tiên chinh phục Everest là ai?', o: ['Junko Tabei', 'Reinhold Messner', 'Peter Habeler', 'Edmund Hillary'], a: 0 },
+  { q: 'Từ khoảng bao nhiêu mét trở lên được gọi là vùng tử thần?', o: ['6.000 m', '7.000 m', '8.000 m', '9.000 m'], a: 2 },
+  { q: 'Chiều cao đỉnh Everest theo khảo sát chung năm 2020?', o: ['8.611 m', '8.586 m', '8.848,86 m', '8.163 m'], a: 2 },
+  { q: 'Các đội thường vượt thác băng Khumbu vào lúc nào?', o: ['Giữa trưa', 'Hoàng hôn', 'Sáng sớm', 'Ban đêm'], a: 2 },
+  { q: 'Everest nằm trên dãy núi nào?', o: ['Karakoram', 'Himalaya', 'Andes', 'Alps'], a: 1 },
+  { q: 'Đỉnh Everest nằm trên biên giới của hai nước nào?', o: ['Nepal và Ấn Độ', 'Nepal và Trung Quốc', 'Bhutan và Trung Quốc', 'Ấn Độ và Pakistan'], a: 1 },
+  { q: 'Tenzing Norgay thuộc dân tộc nào?', o: ['Sherpa', 'Gurkha', 'Tamang', 'Newar'], a: 0 },
+  { q: 'Ngọn núi cao thứ hai thế giới là ngọn nào?', o: ['K2', 'Kangchenjunga', 'Lhotse', 'Makalu'], a: 0 },
+  { q: 'Lhotse, ngọn núi liền kề Everest, cao khoảng bao nhiêu?', o: ['8.163 m', '8.516 m', '8.611 m', '8.586 m'], a: 1 },
+  { q: 'Mùa leo núi phổ biến nhất trên Everest là mùa nào?', o: ['Mùa đông', 'Mùa xuân', 'Mùa thu', 'Mùa hè'], a: 1 },
+  { q: 'Cờ cầu nguyện Tây Tạng có bao nhiêu màu cơ bản?', o: ['3', '4', '5', '6'], a: 2 },
+  { q: 'Trong năm màu cờ cầu nguyện, màu nào tượng trưng cho đất?', o: ['Xanh dương', 'Trắng', 'Đỏ', 'Vàng'], a: 3 },
+  { q: 'Tên gọi "Everest" được đặt theo ai?', o: ['George Everest', 'Edmund Everest', 'Thomas Everest', 'Charles Everest'], a: 0 }
+];
+
+// Lời dẫn: câu chuyện và cách chơi
+const PROLOGUE = `Năm 1953, hai người leo núi đứng trên đỉnh thế giới. Hơn bảy mươi năm sau, đỉnh núi vẫn đòi hỏi một thứ rất cụ thể: một đầu óc tỉnh táo, nhớ được đường và nhớ được những gì đã thấy. Bạn là người leo núi mới đến Base Camp. Muốn lên đỉnh, bạn phải đi qua sáu trại, và mỗi trại sẽ giữ lại một mẩu chuyện về núi.`;
+const HOW_TO = [
+  'Chạm vào một trại đang mở để bắt đầu thử thách.',
+  'Mỗi trại có một bài trí nhớ riêng và một giới hạn thời gian. Thanh đếm ngược hiện ngay trên bàn chơi.',
+  'Vượt qua thử thách để mở khóa trại kế tiếp và đọc mẩu kiến thức được ghi nhận.',
+  'Thua cũng không sao. Hãy thử lại, trí nhớ luyện càng nhiều càng bền.',
+  'Trại cuối là bài kiểm tra tổng hợp. Mọi điều đã học đều nằm ở đó.'
+];
+const LORE = [
+  'Lều được dựng giữa băng và đá, và trên sườn núi phấp phới những lá cờ cầu nguyện. Theo truyền thống Tây Tạng, năm màu xanh dương, trắng, đỏ, xanh lá và vàng tượng trưng cho bầu trời, gió, lửa, nước và đất. Mỗi lá cờ mang một lời nguyện, và chuỗi màu cũng vậy: sai một màu là sai cả lời nguyện. Hãy ghi nhớ đúng thứ tự để đoàn sherpa đọc được lời cầu bình an trên đường lên.',
+  'Trước mặt là thác băng luôn chuyển động. Mỗi thẻ băng là một khe nứt có thể có hoặc không. Tìm đúng cặp, đừng lãng phí bước chân.',
+  'Ở độ cao này, ký hiệu nhỏ trên bản tin của trạm liên lạc thay đổi liên tục. Giữ đầu óc sắc bén, phân biệt cái vừa hiện ra với cái đã hiện ra trước đó.',
+  'Từ đây mọi thứ chậm lại. Hãy nhớ dãy số mà trạm radio vừa gửi về. Mất một chữ số, bạn sẽ mất cả hướng đi.',
+  'Yên Nam là điểm dừng cuối trước vùng tử thần. Bản đồ băng sáng lên trong chốc lát, rồi tắt. Ghi nhớ thật kỹ những ô đã sáng.',
+  'Đỉnh đã ở ngay trước mắt. Các mẩu chuyện bạn đã thu thập trên đường lên sẽ được hỏi lại. Chỉ cần nhớ đúng, bạn sẽ đứng trên đỉnh.'
+];
+
+// Hai chế độ: thường và nhi đồng (ít lượt, nhiều thời gian hơn)
+const MODES = {
+  normal: {
+    limit: { sequence: 90, pairs: 60, nback: 60, digits: 120, grid: 60, quiz: 150 },
+    pairTurns: 20, pairCount: 8, seqTarget: 6,
+    nN: 20, nNeed: 16, digitLens: [4, 5, 6, 7], gridRounds: [3, 5], quizCount: 15
+  },
+  kids: {
+    limit: { sequence: 120, pairs: 90, nback: 90, digits: 150, grid: 90, quiz: 240 },
+    pairTurns: 30, pairCount: 6, seqTarget: 4,
+    nN: 12, nNeed: 9, digitLens: [3, 4, 5], gridRounds: [2, 3], quizCount: 8
+  }
+};
+
+const KEY = 'everest-progress-v1';
+const FX = 'everest-fx-v1';
+const KIDS = 'everest-kids-v1';
+const $ = (s) => document.querySelector(s);
+const app = $('#app');
+
+let done = 0;
+try { done = Math.min(CAMPS.length, (+localStorage.getItem(KEY)) || 0); } catch (e) {}
+let fxOn = true;
+try { fxOn = localStorage.getItem(FX) !== 'off'; } catch (e) {}
+const kids = false; // chế độ nhi đồng đã được bỏ: luôn dùng thiết lập thường
+let windOn = false;
+let wind = null;
+
+function mode() { return kids ? MODES.kids : MODES.normal; }
+function limitOf(g) { return mode().limit[g]; }
+function turnsOf(g) {
+  const m = mode();
+  const t = { pairs: m.pairTurns, nback: m.nN, digits: m.digitLens.length, grid: m.gridRounds.length, quiz: m.quizCount };
+  return t[g] || 0;
+}
+function quizSet() { return QUIZ.slice(0, mode().quizCount); }
+
+function saveProgress(n) { try { localStorage.setItem(KEY, String(n)); } catch (e) {} }
+
+/* ---------- Âm thanh ---------- */
+let AC = null;
+function ctx() {
+  if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+  if (AC.state === 'suspended') AC.resume();
+  return AC;
+}
+// Trình duyệt điện thoại chỉ cho phát âm thanh sau một lần chạm của người dùng,
+// nên mở khóa ngay ở lần chạm đầu tiên, không đợi đến lúc có tiếng
+function unlockAudio() {
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+  try {
+    const c = ctx();
+    if (c.state !== 'running') c.resume();
+    const s = c.createBufferSource();
+    s.buffer = c.createBuffer(1, 1, 22050);
+    s.connect(c.destination);
+    s.start(0);
+  } catch (e) {}
+}
+['pointerdown', 'touchend', 'keydown'].forEach(ev =>
+  document.addEventListener(ev, unlockAudio, { passive: true }));
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && AC && AC.state !== 'running') AC.resume().catch(() => {});
+});
+function tone(f, dur = 0.2, type = 'sine', vol = 0.15, delay = 0) {
+  if (!fxOn) return;
+  try {
+    const c = ctx(), t = c.currentTime + delay;
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(c.destination);
+    o.start(t); o.stop(t + dur + 0.05);
+  } catch (e) {}
+}
+function fanfare() { [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.45, 'triangle', 0.16, i * 0.13)); }
+function unlockSound() { [392, 523, 659].forEach((f, i) => tone(f, 0.25, 'sine', 0.14, i * 0.1)); }
+// Rung nhẹ trên điện thoại khi được hỗ trợ; không lỗi nếu không có
+function buzz(pattern) { try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) {} }
+// Tiếng nổ: tiếng ồn tắt dần kết hợp một nhịp trầm
+function boomSound() {
+  if (!fxOn) return;
+  try {
+    const c = ctx();
+    const len = Math.floor(c.sampleRate * 1.2);
+    const buf = c.createBuffer(1, len, c.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+    const src = c.createBufferSource(); src.buffer = buf;
+    const lp = c.createBiquadFilter(); lp.type = 'lowpass';
+    lp.frequency.setValueAtTime(1400, c.currentTime);
+    lp.frequency.exponentialRampToValueAtTime(80, c.currentTime + 1.1);
+    const g = c.createGain(); g.gain.value = 0.9;
+    src.connect(lp); lp.connect(g); g.connect(c.destination);
+    src.start();
+  } catch (e) {}
+  tone(60, 0.7, 'sine', 0.35);
+}
+// Hiệu ứng nổ: lóe sáng, vòng sóng, mảnh bay và chữ BOOM
+function boomFx() {
+  const b = document.createElement('div');
+  b.className = 'boom';
+  b.setAttribute('aria-hidden', 'true');
+  let parts = '';
+  for (let k = 0; k < 22; k++) {
+    const a = Math.random() * Math.PI * 2, r = 90 + Math.random() * 160;
+    parts += `<i style="--dx:${(Math.cos(a) * r).toFixed(0)}px;--dy:${(Math.sin(a) * r).toFixed(0)}px;--d:${(Math.random() * 0.15).toFixed(2)}s"></i>`;
+  }
+  b.innerHTML = `<span class="flash"></span><span class="ring"></span><span class="boom-word">BOOM!</span>${parts}`;
+  document.body.appendChild(b);
+  setTimeout(() => b.remove(), 1600);
+}
+function setWind(on) {
+  windOn = on;
+  if (wind) { try { wind.src.stop(); } catch (e) {} wind = null; }
+  if (on) {
+    try {
+      const c = ctx();
+      // Gió núi: tiếng ồn nâu đã chuẩn hóa biên độ, vòng lặp dài, âm lượng đều không đổi
+      const len = c.sampleRate * 10;
+      const buf = c.createBuffer(1, len, c.sampleRate);
+      const d = buf.getChannelData(0);
+      let v = 0, peak = 0;
+      for (let i = 0; i < len; i++) {
+        v = (v + 0.04 * (Math.random() * 2 - 1)) / 1.04;
+        d[i] = v;
+        if (Math.abs(v) > peak) peak = Math.abs(v);
+      }
+      for (let i = 0; i < len; i++) d[i] = d[i] / peak * 0.9;
+      const src = c.createBufferSource(); src.buffer = buf; src.loop = true;
+      const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1100;
+      const g = c.createGain(); g.gain.value = 0.55;
+      src.connect(lp); lp.connect(g); g.connect(c.destination);
+      src.start();
+      wind = { src };
+    } catch (e) { windOn = false; }
+  }
+  renderMap();
+}
+
+/* ---------- Phiên chơi (để hủy hẹn giờ khi rời màn hình) ---------- */
+let S = null;
+function newSession() {
+  endSession();
+  const ids = [], cleanups = []; let alive = true;
+  S = {
+    later(fn, ms) { ids.push(setTimeout(() => { if (alive) fn(); }, ms)); },
+    onStop(fn) { cleanups.push(fn); },
+    stop() {
+      alive = false;
+      ids.forEach(clearTimeout);
+      cleanups.splice(0).forEach(fn => { try { fn(); } catch (e) {} });
+    }
+  };
+  return S;
+}
+function endSession() { if (S) { S.stop(); S = null; } }
+
+function shuffle(a) {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ---------- Bản đồ ---------- */
+function renderMap() {
+  endSession();
+  const pct = Math.round(done / CAMPS.length * 100);
+  app.innerHTML = `
+    <header class="top">
+      <div>
+        <p class="eyebrow">Everest · 8.848,86 m</p>
+        <h1>Chinh Phục Everest</h1>
+      </div>
+      <div class="toggles">
+        <button id="fx" class="chip ${fxOn ? 'on' : ''}" aria-pressed="${fxOn}">Âm hiệu</button>
+        <button id="wind" class="chip ${windOn ? 'on' : ''}" aria-pressed="${windOn}">Gió núi</button>
+      </div>
+    </header>
+    <details class="prologue" ${done === 0 ? 'open' : ''}>
+      <summary>Lời dẫn và cách chơi</summary>
+      <p>${PROLOGUE}</p>
+      <ol>${HOW_TO.map(s => `<li>${s}</li>`).join('')}</ol>
+    </details>
+    <section class="meter" aria-label="Tiến trình leo">
+      <div class="meter-bar"><span style="--w:${pct}%"></span></div>
+      <p>${done}/${CAMPS.length} trại đã vượt qua</p>
+    </section>
+    ${done === CAMPS.length ? '<p class="summit">Bạn đã đứng trên đỉnh Everest.</p>' : ''}
+    <ol class="route">
+      ${CAMPS.map((c, i) => {
+        const st = i < done ? 'done' : (i === done ? 'open' : 'locked');
+        return `
+        <li class="camp ${st}">
+          <button class="camp-btn" data-i="${i}" ${st === 'locked' ? 'disabled' : ''}>
+            <span class="alt">${c.alt}</span>
+            <span class="name"><span class="roman">${c.roman}</span>${c.name}</span>
+            <span class="ch">${st === 'locked' ? 'Chưa mở khóa' : c.title}</span>
+          </button>
+          ${st === 'done' ? `<p class="fact">${c.fact}</p>` : ''}
+        </li>`;
+      }).join('')}
+    </ol>
+    <footer class="foot">
+      <p>Mỗi trại mở khóa một mẩu kiến thức về Everest. Âm thanh bật sau lần chạm đầu tiên.</p>
+      <button id="reset" class="ghost">Xóa tiến trình</button>
+    </footer>`;
+
+  $('#fx').onclick = () => {
+    fxOn = !fxOn;
+    try { localStorage.setItem(FX, fxOn ? 'on' : 'off'); } catch (e) {}
+    tone(523, 0.12, 'triangle', 0.12);
+    renderMap();
+  };
+  $('#wind').onclick = () => setWind(!windOn);
+  app.querySelectorAll('.camp-btn').forEach(b => b.onclick = () => renderCamp(+b.dataset.i));
+
+  let armed = false;
+  $('#reset').onclick = (e) => {
+    const b = e.currentTarget;
+    if (!armed) {
+      armed = true;
+      b.textContent = 'Chạm lần nữa để xóa';
+      setTimeout(() => { armed = false; if (b.isConnected) b.textContent = 'Xóa tiến trình'; }, 3000);
+      return;
+    }
+    done = 0; saveProgress(0); renderMap();
+  };
+}
+
+/* ---------- Màn thử thách ---------- */
+function renderCamp(i) {
+  const sess = newSession();
+  const c = CAMPS[i];
+  const limit = limitOf(c.game);
+  const turns = turnsOf(c.game);
+  app.innerHTML = `
+    <header class="top">
+      <button class="ghost" id="back">← Các trại</button>
+      <span class="alt">${c.alt}</span>
+    </header>
+    <section class="stage">
+      <p class="eyebrow">Trại ${c.roman} · ${c.name}</p>
+      <h2>${c.title}</h2>
+      <p class="lore">${LORE[i]}</p>
+      <p class="desc">${c.desc}</p>
+      <div class="meters">
+        <div class="panel">
+          <p class="pl">Thời gian · tối đa ${limit}s</p>
+          <div class="timer-bar"><span id="tbar"></span></div>
+          <p class="pv" id="tsec">${limit}s</p>
+        </div>
+        ${turns ? `
+        <div class="panel">
+          <p class="pl">Lượt còn lại</p>
+          <div class="turn-track"><span id="tturn">${turns}</span><small>/ ${turns}</small></div>
+        </div>` : ''}
+      </div>
+      <div id="board" class="board"></div>
+      <p id="status" class="status" aria-live="polite"></p>
+      <div id="result"></div>
+    </section>`;
+  $('#back').onclick = renderMap;
+
+  let finished = false;
+  const x = {
+    board: $('#board'),
+    setStatus: (t) => { const s = $('#status'); if (s) s.textContent = t; },
+    later: (fn, ms) => sess.later(fn, ms),
+    onStop: (fn) => sess.onStop(fn),
+    setTurns: (n) => {
+      const t = $('#tturn');
+      if (t) { t.textContent = n; t.classList.toggle('low', n <= 2); }
+    },
+    finish: (passed, reason) => { if (finished) return; finished = true; finish(i, passed, reason); }
+  };
+
+  // Đồng hồ đếm ngược: hết giờ thì thử thách kết thúc như một lần thua
+  const limitMs = limit * 1000;
+  let startedAt = 0;
+  const tick = () => {
+    const left = Math.max(0, limitMs - (Date.now() - startedAt));
+    const bar = $('#tbar'), sec = $('#tsec');
+    if (bar) { bar.style.width = (left / limitMs * 100) + '%'; bar.classList.toggle('low', left < 15000); }
+    if (sec) sec.textContent = Math.ceil(left / 1000) + 's';
+    if (left <= 0) { x.finish(false, 'Hết giờ.'); return; }
+    sess.later(tick, 100);
+  };
+  // Đếm 3 giây rồi mới bắt đầu: đồng hồ và trò chơi chỉ chạy sau khi người chơi bấm Bắt đầu
+  const begin = () => {
+    const board = $('#board');
+    const status = $('#status');
+    if (status) status.textContent = 'Chuẩn bị';
+    let n = 3;
+    const countdown = () => {
+      if (n > 0) {
+        if (board) board.innerHTML = `<div class="countdown">${n}</div>`;
+        tone(440, 0.1, 'sine', 0.12);
+        n--;
+        sess.later(countdown, 1000);
+        return;
+      }
+      if (board) board.innerHTML = '';
+      if (status) status.textContent = '';
+      startedAt = Date.now();
+      tick();
+      GAMES[c.game](x);
+    };
+    countdown();
+  };
+  const board = $('#board');
+  if (board) board.innerHTML = `<button id="go" class="primary big">Bắt đầu</button>`;
+  const status = $('#status');
+  if (status) status.textContent = 'Đọc lời dẫn, rồi bấm Bắt đầu khi sẵn sàng.';
+  const go = $('#go');
+  if (go) go.onclick = () => { go.disabled = true; begin(); };
+}
+
+function finish(i, passed, reason) {
+  endSession();
+  const board = $('#board'), result = $('#result');
+  if (board) board.innerHTML = '';
+  if (!passed) {
+    tone(120, 0.5, 'sawtooth', 0.18);
+    buzz([60, 80, 60]);
+    boomSound();
+    boomFx();
+    const stage = $('.stage');
+    if (stage) stage.classList.add('shake');
+    result.innerHTML = `
+      <div class="result fail">
+        <p>${reason || 'Chưa đủ.'} Hít thở, lấy lại nhịp rồi thử lại.</p>
+        <div class="row">
+          <button id="retry" class="primary">Thử lại</button>
+          <button id="leave" class="ghost">Các trại</button>
+        </div>
+      </div>`;
+    $('#retry').onclick = () => renderCamp(i);
+    $('#leave').onclick = renderMap;
+    return;
+  }
+  const last = i === CAMPS.length - 1;
+  if (i === done) { done = i + 1; saveProgress(done); }
+  last ? fanfare() : unlockSound();
+  buzz(last ? [40, 60, 40, 60, 120] : 30);
+  result.innerHTML = `
+    <div class="result win">
+      <p class="eyebrow">${last ? 'Đỉnh Everest đã chinh phục' : 'Đã ghi nhận · Trại ' + CAMPS[i].roman + ' · ' + CAMPS[i].name}</p>
+      <p class="fact-big">${CAMPS[i].fact}</p>
+      <div class="row"><button id="next" class="primary">${last ? 'Về bản đồ' : 'Tiếp tục leo'}</button></div>
+    </div>`;
+  $('#next').onclick = renderMap;
+}
+
+/* ---------- Các trò thử thách ---------- */
+const GAMES = {};
+
+// Chuỗi cờ: lặp lại chuỗi màu, mỗi lượt dài thêm một bước, đến đủ số bước thì thắng
+GAMES.sequence = (x) => {
+  const TARGET = mode().seqTarget;
+  // Máy tính có chuột tinh vi và bàn phím: nhận phím 1–5; điện thoại không hiện gợi ý này
+  const desktop = !!(window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches);
+  // Năm màu cờ theo truyền thống: xanh dương (bầu trời), trắng (gió), đỏ (lửa), xanh lá (nước), vàng (đất)
+  const COLORS = [
+    { name: 'Xanh dương', c: 'var(--flag-blue)', f: 392 }, { name: 'Trắng', c: 'var(--flag-white)', f: 523 },
+    { name: 'Đỏ', c: 'var(--flag-red)', f: 659 }, { name: 'Xanh lá', c: 'var(--flag-green)', f: 784 },
+    { name: 'Vàng', c: 'var(--flag-yellow)', f: 880 }
+  ];
+  let seq = [], pos = 0, accept = false, replaysLeft = 1, reverse = false, expect = [];
+  x.board.innerHTML = `
+    <div class="seq">
+      <p id="cue" class="cue" aria-live="polite"></p>
+      <div class="pad">${COLORS.map((k, i) =>
+        `<button class="tile" data-k="${i}" style="--c:${k.c}" aria-label="${k.name}" title="${k.name}"></button>`).join('')}</div>
+      <div class="pips" aria-hidden="true">${Array.from({ length: TARGET }, () => '<span></span>').join('')}</div>
+      <div class="tools"><button id="replay" class="ghost">Nghe lại</button></div>
+      ${desktop ? '<p class="tip">Bàn phím: nhấn 1, 2, 3, 4, 5 tương ứng năm lá cờ từ trái sang phải.</p>' : ''}
+      <p class="tip">Mẹo: nhóm các màu thành cụm 2 hoặc 3, ví dụ "xanh dương, trắng, đỏ", sẽ dễ nhớ hơn.</p>
+    </div>`;
+  const tiles = [...x.board.querySelectorAll('.tile')];
+  // Ô đang hiện màu c (vị trí các ô đổi mỗi vòng)
+  const colorTile = (c) => tiles.find(t => +t.dataset.k === c);
+  const pad = x.board.querySelector('.pad');
+  const pips = [...x.board.querySelectorAll('.pips span')];
+  const replayBtn = $('#replay');
+
+  const updateTools = () => {
+    replayBtn.disabled = !accept || replaysLeft <= 0 || pos > 0;
+    replayBtn.textContent = replaysLeft > 0 ? `Nghe lại (còn ${replaysLeft})` : 'Đã hết lượt nghe';
+  };
+  const setReady = (on) => { accept = on; pad.classList.toggle('ready', on); updateTools(); };
+  const setPips = () => pips.forEach((p, j) => p.classList.toggle('on', j < seq.length));
+
+  const flash = (k, dur = 260) => {
+    colorTile(k).classList.add('lit');
+    tone(COLORS[k].f, dur / 1000, 'triangle', 0.22);
+    x.later(() => colorTile(k).classList.remove('lit'), dur);
+  };
+  const playBack = () => {
+    setReady(false);
+    x.setStatus(`Ghi nhớ · ${seq.length} bước`);
+    seq.forEach((k, j) => x.later(() => flash(k), 500 + j * 380));
+    x.later(() => {
+      pos = 0;
+      expect = reverse ? [...seq].reverse() : [...seq];
+      setReady(true);
+      x.setStatus(`Đến lượt bạn · ${reverse ? 'ngược' : 'thuận'} · 0/${seq.length}`);
+    }, 600 + seq.length * 380);
+  };
+
+  replayBtn.onclick = () => {
+    if (!accept || replaysLeft <= 0 || pos > 0) return;
+    replaysLeft--;
+    tone(330, 0.08, 'sine', 0.08);
+    playBack();
+  };
+
+  const next = () => {
+    // Không lặp lại màu vừa rồi, để không đoán được màu kế tiếp
+    let c;
+    do { c = Math.floor(Math.random() * 5); } while (seq.length && c === seq[seq.length - 1]);
+    seq.push(c);
+    replaysLeft = 1;
+    setPips();
+    // Đổi vị trí các lá cờ mỗi vòng, nên không thể nhớ theo vị trí cũ
+    const layout = shuffle([0, 1, 2, 3, 4]);
+    tiles.forEach((t, p) => {
+      t.dataset.k = layout[p];
+      t.style.setProperty('--c', COLORS[layout[p]].c);
+      t.setAttribute('aria-label', COLORS[layout[p]].name);
+    });
+    // Luật vòng này: THUẬN (nhập đúng thứ tự) hoặc NGƯỢC (nhập từ cuối về đầu).
+    // Luật chỉ hiện trong chốc lát trước khi chuỗi chạy.
+    reverse = Math.random() < 0.5;
+    const cue = $('#cue');
+    setReady(false);
+    if (cue) {
+      cue.textContent = reverse ? 'NGƯỢC' : 'THUẬN';
+      cue.classList.toggle('rev', reverse);
+      cue.classList.add('show');
+    }
+    x.setStatus('Chú ý luật của vòng này');
+    x.later(() => {
+      if (cue) cue.classList.remove('show');
+      playBack();
+    }, 1600);
+  };
+
+  tiles.forEach((t) => t.onclick = () => {
+    if (!accept) return;
+    const k = +t.dataset.k;
+    buzz(12);
+    flash(k, 260);
+    if (k !== expect[pos]) {
+      // Sai: hiện ô đúng bằng viền trắng và rung nhẹ, rồi kết thúc thử thách
+      setReady(false);
+      tone(120, 0.5, 'sawtooth', 0.2);
+      colorTile(expect[pos]).classList.add('hint');
+      pad.classList.add('shake');
+      x.setStatus('Sai rồi. Ô có viền trắng là màu đúng.');
+      x.later(() => x.finish(false), 1400);
+      return;
+    }
+    pos++;
+    x.setStatus(`Đến lượt bạn · ${reverse ? 'ngược' : 'thuận'} · ${pos}/${seq.length}`);
+    if (pos === seq.length) {
+      setReady(false);
+      if (seq.length === TARGET) {
+        x.setStatus('Hoàn thành! Năm lá cờ đã được ghi nhớ.');
+        x.later(() => x.finish(true), 700);
+      } else {
+        x.setStatus('Đúng! Thêm một bước...');
+        x.later(next, 900);
+      }
+    } else {
+      updateTools();
+    }
+  });
+
+  // Bàn phím (chỉ máy tính): phím 1–5 là năm lá cờ từ trái sang phải
+  if (desktop) {
+    const onKey = (e) => {
+      if (e.repeat || e.altKey || e.ctrlKey || e.metaKey) return;
+      const idx = '12345'.indexOf(e.key);
+      if (idx < 0 || !accept) return;
+      tiles[idx].click();
+    };
+    document.addEventListener('keydown', onKey);
+    x.onStop(() => document.removeEventListener('keydown', onKey));
+  }
+
+  x.later(next, 500);
+};
+
+// Cặp băng: tìm các cặp giống nhau trong số lượt có hạn
+GAMES.pairs = (x) => {
+  const m = mode();
+  const MAX = m.pairTurns;
+  const SYM = ['▲', '●', '■', '◆', '★', '✚', '✦', '☀'].slice(0, m.pairCount);
+  const COLS = ['--flag-blue', '--flag-red', '--flag-green', '--flag-yellow', '--flag-blue', '--flag-red', '--flag-green', '--flag-yellow'];
+  const deck = shuffle(SYM.flatMap((s, i) => [{ s, i }, { s, i }]));
+  const cols = m.pairCount <= 6 ? 3 : 4;
+  let open = [], matched = 0, moves = 0, lock = false;
+  x.board.innerHTML = `<div class="grid4" style="grid-template-columns:repeat(${cols},1fr)">${deck.map((d, k) =>
+    `<button class="card" data-k="${k}" aria-label="Thẻ ${k + 1}">
+       <span class="back">✶</span>
+       <span class="front" style="color:var(${COLS[d.i]})">${d.s}</span>
+     </button>`).join('')}</div>`;
+  const cards = [...x.board.querySelectorAll('.card')];
+  x.setStatus(`Lượt còn lại: ${MAX}`);
+  cards.forEach(card => card.onclick = () => {
+    const k = +card.dataset.k;
+    if (lock || card.classList.contains('up') || card.classList.contains('gone')) return;
+    card.classList.add('up');
+    tone(440 + open.length * 80, 0.12, 'sine', 0.14);
+    open.push(k);
+    if (open.length === 2) {
+      moves++; lock = true;
+      x.setTurns(MAX - moves);
+      const [a, b] = open;
+      if (deck[a].s === deck[b].s) {
+        x.later(() => {
+          cards[a].classList.add('gone'); cards[b].classList.add('gone');
+          tone(784, 0.2, 'triangle', 0.2); tone(988, 0.25, 'triangle', 0.18, 0.1);
+          matched++; open = []; lock = false;
+          if (matched === m.pairCount) { x.setStatus('Đã ghép hết!'); x.finish(true); }
+          else x.setStatus(`Lượt còn lại: ${MAX - moves}`);
+        }, 350);
+      } else {
+        x.later(() => {
+          cards[a].classList.remove('up'); cards[b].classList.remove('up');
+          open = []; lock = false;
+          if (moves >= MAX) {
+            tone(120, 0.5, 'sawtooth', 0.2);
+            x.setStatus('Hết lượt!');
+            x.later(() => x.finish(false, 'Hết lượt.'), 500);
+          } else x.setStatus(`Lượt còn lại: ${MAX - moves}`);
+        }, 800);
+      }
+    }
+  });
+};
+
+// Ký hiệu lặp lại: nhấn TRÙNG khi chữ hiện ra giống chữ ở ô "2 bước trước"
+GAMES.nback = (x) => {
+  const m = mode();
+  const L = ['A', 'K', 'M', 'T'], N = m.nN, NEED = m.nNeed;
+  const SHOW = kids ? 1800 : 1400, GAP = kids ? 600 : 500;
+  const seq = Array.from({ length: N }, () => L[Math.floor(Math.random() * 4)]);
+  let correct = 0, responded = false;
+  x.board.innerHTML = `
+    <div class="nb">
+      <div class="hist">
+        <div class="ref"><small>2 bước trước</small><b id="h2">—</b></div>
+        <div><small>1 bước trước</small><b id="h1">—</b></div>
+      </div>
+      <div id="nbl" class="nb-letter">·</div>
+      <p id="nbfb" class="nb-fb" aria-live="polite"></p>
+      <button id="trung" class="primary big">TRÙNG</button>
+      <p class="hint">Nhấn TRÙNG khi chữ hiện ra <b>giống</b> chữ ở ô "2 bước trước". Chỉ nhấn lúc chữ còn đang hiện.</p>
+    </div>`;
+  const el = $('#nbl'), fb = $('#nbfb'), h2 = $('#h2'), h1 = $('#h1');
+  $('#trung').onclick = () => {
+    if (responded || !el.classList.contains('show')) return;
+    responded = true; tone(660, 0.1, 'sine', 0.14);
+    fb.textContent = 'Đã nhấn TRÙNG';
+  };
+  const trial = (k) => {
+    if (k >= N) {
+      x.setStatus(`Đúng ${correct}/${N}`);
+      fb.textContent = '';
+      x.later(() => x.finish(correct >= NEED), 700);
+      return;
+    }
+    responded = false;
+    x.setTurns(N - k);
+    h2.textContent = k >= 2 ? seq[k - 2] : '—';
+    h1.textContent = k >= 1 ? seq[k - 1] : '—';
+    el.className = 'nb-letter show';
+    el.textContent = seq[k];
+    fb.textContent = '';
+    x.setStatus(`${k + 1}/${N}`);
+    x.later(() => {
+      el.classList.remove('show');
+      el.textContent = '·';
+      const target = k >= 2 && seq[k] === seq[k - 2];
+      let msg, good;
+      if (target && responded) { good = true; msg = 'Đúng: chữ giống 2 bước trước'; }
+      else if (!target && !responded) { good = true; msg = 'Đúng: không nhấn là đúng'; }
+      else if (target) { good = false; msg = 'Bỏ lỡ: chữ này giống 2 bước trước'; }
+      else { good = false; msg = 'Sai: chữ này không giống 2 bước trước'; }
+      if (good) { correct++; tone(523, 0.08, 'triangle', 0.1); }
+      else tone(180, 0.15, 'square', 0.08);
+      el.classList.add(good ? 'ok' : 'bad');
+      fb.textContent = msg;
+      x.later(() => trial(k + 1), GAP);
+    }, SHOW);
+  };
+  x.later(() => trial(0), 400);
+};
+
+// Dãy số: nhìn trong 3 giây, rồi nhập lại đúng thứ tự
+GAMES.digits = (x) => {
+  const LENS = mode().digitLens;
+  const VIEW_MS = 3000;
+  let r = 0;
+  const round = () => {
+    const n = LENS[r];
+    let d = '';
+    for (let k = 0; k < n; k++) d += Math.floor(Math.random() * 10);
+    x.setTurns(LENS.length - r);
+    x.setStatus(`Vòng ${r + 1}/${LENS.length} · ghi nhớ trong 3 giây`);
+    x.board.innerHTML = `<div class="dshow">${d.split('').join(' ')}</div>`;
+    x.later(() => {
+      x.setStatus(`Nhập lại ${n} chữ số`);
+      x.board.innerHTML = `
+        <div>
+          <div id="dv" class="dshow">·</div>
+          <div class="keys">${[1, 2, 3, 4, 5, 6, 7, 8, 9, '⌫', 0, 'OK'].map(k =>
+            `<button class="key" data-k="${k}">${k}</button>`).join('')}</div>
+        </div>`;
+      const dv = $('#dv');
+      let input = '', judged = false;
+      x.board.querySelectorAll('.key').forEach(b => b.onclick = () => {
+        if (judged) return;
+        const k = b.dataset.k;
+        if (k === 'OK') {
+          if (input.length !== n) { x.setStatus(`Cần nhập đủ ${n} chữ số`); return; }
+          judged = true;
+          if (input === d) {
+            tone(784, 0.15, 'triangle', 0.16);
+            r++;
+            if (r >= LENS.length) { x.setStatus('Chính xác!'); x.later(() => x.finish(true), 700); }
+            else x.later(round, 800);
+          } else {
+            tone(120, 0.5, 'sawtooth', 0.2);
+            x.setStatus(`Sai. Dãy đúng: ${d.split('').join(' ')}`);
+            x.later(() => x.finish(false), 1400);
+          }
+          return;
+        }
+        if (k === '⌫') input = input.slice(0, -1);
+        else if (input.length < n) { input += k; tone(330 + Number(k) * 25, 0.08, 'triangle', 0.1); }
+        dv.textContent = input ? input.split('').join(' ') : '·';
+      });
+    }, VIEW_MS);
+  };
+  x.later(round, 400);
+};
+
+// Bản đồ băng: nhìn các ô sáng trong 3 giây, rồi chạm lại đúng vị trí
+GAMES.grid = (x) => {
+  const SIZE = 5, ROUNDS = mode().gridRounds;
+  const VIEW_MS = 3000;
+  let r = 0, target = new Set(), picks = new Set(), accept = false;
+  const round = () => {
+    const k = ROUNDS[r];
+    x.setTurns(ROUNDS.length - r);
+    target = new Set();
+    while (target.size < k) target.add(Math.floor(Math.random() * SIZE * SIZE));
+    picks = new Set(); accept = false;
+    x.board.innerHTML = `<div class="grid5">${Array.from({ length: SIZE * SIZE }, (_, i) =>
+      `<button class="cell" data-i="${i}" aria-label="Ô ${i + 1}"></button>`).join('')}</div>`;
+    const cells = [...x.board.querySelectorAll('.cell')];
+
+    const check = () => {
+      accept = false;
+      const good = [...picks].every(i => target.has(i));
+      cells.forEach((c, i) => { if (target.has(i) && !picks.has(i)) c.classList.add('miss'); });
+      if (good) {
+        tone(784, 0.15, 'triangle', 0.16);
+        r++;
+        if (r >= ROUNDS.length) { x.setStatus('Bản đồ đã nhớ đủ!'); x.later(() => x.finish(true), 800); }
+        else { x.setStatus('Chính xác!'); x.later(round, 900); }
+      } else {
+        tone(120, 0.5, 'sawtooth', 0.2);
+        x.setStatus('Sai vị trí.');
+        x.later(() => x.finish(false), 1300);
+      }
+    };
+
+    cells.forEach(c => c.onclick = () => {
+      if (!accept) return;
+      const i = +c.dataset.i;
+      if (picks.has(i)) { picks.delete(i); c.classList.remove('pick'); }
+      else if (picks.size < k) { picks.add(i); c.classList.add('pick'); }
+      tone(330 + picks.size * 60, 0.08, 'sine', 0.1);
+      if (picks.size === k) check();
+    });
+
+    target.forEach(i => cells[i].classList.add('lit'));
+    tone(523, 0.25, 'triangle', 0.12);
+    x.setStatus(`Vòng ${r + 1}/${ROUNDS.length} · ghi nhớ trong 3 giây`);
+    x.later(() => {
+      target.forEach(i => cells[i].classList.remove('lit'));
+      accept = true;
+      x.setStatus(`Chạm lại ${k} ô vừa sáng`);
+    }, VIEW_MS);
+  };
+  x.later(round, 300);
+};
+
+// Trí nhớ đỉnh: các câu hỏi về mẩu kiến thức đã thu thập, phải đúng hết
+GAMES.quiz = (x) => {
+  const QS = quizSet();
+  let k = 0;
+  const show = () => {
+    const Q = QS[k];
+    let locked = false;
+    x.setTurns(QS.length - k);
+    x.setStatus(`Câu ${k + 1}/${QS.length}`);
+    x.board.innerHTML = `
+      <div>
+        <p class="q">${Q.q}</p>
+        <div class="opts">${Q.o.map((t, j) => `<button class="opt" data-j="${j}">${t}</button>`).join('')}</div>
+      </div>`;
+    x.board.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+      if (locked) return;
+      locked = true;
+      const j = +b.dataset.j;
+      const btns = [...x.board.querySelectorAll('.opt')];
+      btns[Q.a].classList.add('right');
+      if (j === Q.a) {
+        tone(784, 0.15, 'triangle', 0.16);
+        k++;
+        x.later(() => { if (k >= QS.length) x.finish(true); else show(); }, 800);
+      } else {
+        b.classList.add('wrong');
+        tone(120, 0.5, 'sawtooth', 0.2);
+        x.setStatus('Chưa đúng. Đáp án xanh là câu trả lời.');
+        x.later(() => x.finish(false), 1400);
+      }
+    });
+  };
+  show();
+};
+
+renderMap();
+</script>
